@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/game_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/gear"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="8dp"
+        android:alpha="0.45"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/settings"
+        android:gravity="center"
+        android:text="@string/settings_gear"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <ScrollView
+        android:id="@+id/settings_panel"
+        android:layout_width="360dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="top|end"
+        android:layout_margin="12dp"
+        android:background="@drawable/panel_bg"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView style="@style/SectionTitle" android:text="@string/section_critters" />
+            <Switch android:id="@+id/sw_mice" style="@style/SettingSwitch" android:text="@string/critter_mice" />
+            <Switch android:id="@+id/sw_roach" style="@style/SettingSwitch" android:text="@string/critter_roach" />
+            <Switch android:id="@+id/sw_rope" style="@style/SettingSwitch" android:text="@string/critter_rope" />
+            <Switch android:id="@+id/sw_butterfly" style="@style/SettingSwitch" android:text="@string/critter_butterfly" />
+            <Switch android:id="@+id/sw_fish" style="@style/SettingSwitch" android:text="@string/critter_fish" />
+            <Switch android:id="@+id/sw_laser" style="@style/SettingSwitch" android:text="@string/critter_laser" />
+
+            <TextView style="@style/SectionTitle" android:text="@string/section_game" />
+            <TextView android:id="@+id/label_speed" style="@style/SettingLabel" />
+            <SeekBar android:id="@+id/seek_speed" style="@style/SettingSeek" />
+            <TextView android:id="@+id/label_size" style="@style/SettingLabel" />
+            <SeekBar android:id="@+id/seek_size" style="@style/SettingSeek" />
+
+            <TextView style="@style/SectionTitle" android:text="@string/section_effects" />
+            <TextView android:id="@+id/label_volume" style="@style/SettingLabel" />
+            <SeekBar android:id="@+id/seek_volume" style="@style/SettingSeek" />
+            <Switch android:id="@+id/sw_lure" style="@style/SettingSwitch" android:text="@string/lure" />
+            <Switch android:id="@+id/sw_flash" style="@style/SettingSwitch" android:text="@string/flash" />
+            <Switch android:id="@+id/sw_score" style="@style/SettingSwitch" android:text="@string/show_score" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_reset"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/reset_score" />
+
+                <Button
+                    android:id="@+id/btn_done"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/done" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:alpha="0.5"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

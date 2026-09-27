@@ -34,6 +34,10 @@ class Sounds(context: Context) {
     val rustle: Int
     val psps: Int
     val sparkle: Int
+    val bubble: Int
+
+    /** Master volume, 0..1. */
+    var volume = 1f
 
     init {
         pool.setOnLoadCompleteListener { _, id, status ->
@@ -45,13 +49,15 @@ class Sounds(context: Context) {
         rustle = load(dir, "rustle", Synth.rustle())
         psps = load(dir, "psps", Synth.psps())
         sparkle = load(dir, "sparkle", Synth.sparkle())
+        bubble = load(dir, "bubble", Synth.bubble())
     }
 
     /** [pan] is -1 (left) .. 1 (right). */
     fun play(id: Int, volume: Float = 1f, pan: Float = 0f, rate: Float = 1f) {
         if (synchronized(loaded) { id !in loaded }) return
         val p = pan.coerceIn(-1f, 1f)
-        pool.play(id, volume * min(1f, 1f - p), volume * min(1f, 1f + p), 1, 0, rate.coerceIn(0.5f, 2f))
+        val v = volume * this.volume
+        pool.play(id, v * min(1f, 1f - p), v * min(1f, 1f + p), 1, 0, rate.coerceIn(0.5f, 2f))
     }
 
     fun autoPause() = pool.autoPause()
@@ -192,6 +198,25 @@ private object Synth {
                 val t = i.toDouble() / SR
                 val env = exp(-t / 0.11) * min(1.0, t / 0.003)
                 out[s0 + i] += (env * (sin(2 * PI * f * t) + 0.3 * sin(2 * PI * f * 2.01 * t)) * 0.6).toFloat()
+            }
+        }
+        return toPcm(out)
+    }
+
+    /** Two quick "bloop"s with exponentially rising pitch. */
+    fun bubble(): ShortArray {
+        val out = FloatArray(len(0.25))
+        val starts = doubleArrayOf(0.0, 0.09)
+        val bases = doubleArrayOf(450.0, 650.0)
+        for (k in starts.indices) {
+            val s0 = len(starts[k])
+            val n = len(0.07)
+            var ph = 0.0
+            for (i in 0 until n) {
+                val t = i.toDouble() / SR
+                ph += 2 * PI * bases[k] * exp(t * 16) / SR
+                val env = min(1.0, t / 0.004) * exp(-t / 0.025)
+                out[s0 + i] += (env * sin(ph)).toFloat()
             }
         }
         return toPcm(out)

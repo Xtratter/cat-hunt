@@ -26,7 +26,11 @@ private class Ring(
 )
 
 @SuppressLint("ViewConstructor")
-class GameView(context: Context, private val sounds: Sounds) : View(context) {
+class GameView(
+    context: Context,
+    private val sounds: Sounds,
+    private val settings: Settings,
+) : View(context) {
     private val d = resources.displayMetrics.density
     private val rnd = Random()
     private val critters = ArrayList<Critter>()
@@ -40,6 +44,9 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
     private var flashColor = 0
     private var caught = 0
     private var hintLeft = 6f
+
+    /** While the settings panel is open: nothing moves, touches are ignored. */
+    var frozen = false
 
     private val bgPaint = Paint()
     private val flashPaint = Paint()
@@ -61,15 +68,25 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
         bgPaint.shader = LinearGradient(
             0f, 0f, 0f, h.toFloat(), 0xFF22343F.toInt(), 0xFF0E171C.toInt(), Shader.TileMode.CLAMP,
         )
-        if (critters.isEmpty()) {
-            critters += Mouse(d, rnd, 0xFFB0B0B0)
-            critters += Roach(d, rnd)
-            critters += Rope(d, rnd, 0xFFFF3D3D, 0xFFFFA0A0, 0xFF5A0000)
-            critters += Mouse(d, rnd, 0xFFE8DCC8)
-            critters += Butterfly(d, rnd, 0xFFFF8F00, 0xFFFFC107)
-            critters += LaserDot(d, rnd)
-            critters.forEachIndexed { i, c -> c.respawnIn = 0.5f + i * 2.5f }
-        }
+        if (critters.isEmpty()) rebuild()
+    }
+
+    /** Recreates critters from the current settings; they enter the screen one by one. */
+    fun rebuild() {
+        val s = d * settings.size
+        critters.clear()
+        if (settings.mice) critters += Mouse(s, rnd, 0xFFB0B0B0)
+        if (settings.roach) critters += Roach(s, rnd)
+        if (settings.rope) critters += Rope(s, rnd, 0xFFFF3D3D, 0xFFFFA0A0, 0xFF5A0000)
+        if (settings.butterfly) critters += Butterfly(s, rnd, 0xFFFF8F00, 0xFFFFC107)
+        if (settings.fish) critters += Fish(s, rnd, 0xFFFF7043, 0xFFFFAB91)
+        if (settings.mice) critters += Mouse(s, rnd, 0xFFE8DCC8)
+        if (settings.laser) critters += LaserDot(s, rnd)
+        critters.forEachIndexed { i, c -> c.respawnIn = 0.5f + i * 2.5f }
+    }
+
+    fun resetScore() {
+        caught = 0
     }
 
     fun resume() {
@@ -88,7 +105,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
         val now = System.nanoTime()
         val dt = if (lastNanos == 0L) 0f else min(0.05f, (now - lastNanos) / 1e9f)
         lastNanos = now
-        update(dt)
+        if (!frozen) update(dt)
         render(canvas)
         if (running) postInvalidateOnAnimation()
     }
@@ -98,6 +115,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
     private fun update(dt: Float) {
         val w = width.toFloat()
         val h = height.toFloat()
+        val critterDt = dt * settings.speed
         for (c in critters) {
             if (!c.alive) {
                 c.respawnIn -= dt
@@ -108,7 +126,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
                 }
                 continue
             }
-            c.update(dt, w, h)
+            c.update(critterDt, w, h)
             if (c is Mouse) {
                 c.voiceIn -= dt
                 if (c.voiceIn <= 0f) {
@@ -120,12 +138,13 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
                 when {
                     c is Roach && rnd.nextFloat() < 0.6f -> sounds.play(sounds.rustle, 0.8f, pan(c), 0.9f + rnd.nextFloat() * 0.3f)
                     c is Rope && rnd.nextFloat() < 0.3f -> sounds.play(sounds.rustle, 0.5f, pan(c), 0.7f)
+                    c is Fish && rnd.nextFloat() < 0.5f -> sounds.play(sounds.bubble, 0.8f, pan(c), 0.8f + rnd.nextFloat() * 0.4f)
                 }
             }
         }
 
         ambientIn -= dt
-        if (ambientIn <= 0f) {
+        if (ambientIn <= 0f && settings.lure) {
             ambientIn = 6f + rnd.nextFloat() * 8f
             if (rnd.nextBoolean()) sounds.play(sounds.psps, 0.9f) else sounds.play(sounds.chirp, 0.8f, rnd.nextFloat() * 2 - 1)
         }
@@ -151,6 +170,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
             is Mouse -> sounds.play(sounds.squeak, 1f, pan(c))
             is Roach -> sounds.play(sounds.rustle, 0.9f, pan(c))
             is Rope, is Butterfly -> sounds.play(sounds.chirp, 0.7f, pan(c))
+            is Fish -> sounds.play(sounds.bubble, 0.9f, pan(c))
         }
     }
 
@@ -181,7 +201,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
             canvas.drawRect(0f, 0f, w, h, flashPaint)
         }
 
-        canvas.drawText("🐾 $caught", 16 * d, 30 * d, scorePaint)
+        if (settings.showScore) canvas.drawText("🐾 $caught", 16 * d, 30 * d, scorePaint)
         if (hintLeft > 0f) {
             hintPaint.alpha = (170 * min(1f, hintLeft)).toInt()
             canvas.drawText(context.getString(R.string.hint_exit), w / 2, h - 24 * d, hintPaint)
@@ -190,6 +210,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(e: MotionEvent): Boolean {
+        if (frozen) return true
         when (e.actionMasked) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN ->
                 touch(e.getX(e.actionIndex), e.getY(e.actionIndex), isDown = true)
@@ -227,7 +248,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
         rings += Ring(tx, ty, 280 * d, 0.6f, 0.6f, 0xFFFFEB3B.toInt(), 12 * d, 1f)
         rings += Ring(tx, ty, 180 * d, 0.45f, 0.45f, 0xFF00E5FF.toInt(), 8 * d, 1f)
         flashColor = sparkColors[rnd.nextInt(sparkColors.size)]
-        flashAlpha = 0.85f
+        if (settings.flash) flashAlpha = 0.85f
         sounds.play(sounds.sparkle, 1f, (tx / width * 2 - 1).coerceIn(-1f, 1f))
     }
 }

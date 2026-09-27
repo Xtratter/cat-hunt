@@ -438,3 +438,97 @@ class LaserDot(d: Float, rnd: Random) : Runner(d, rnd) {
         c.drawCircle(jx, jy, 2.5f * s, center)
     }
 }
+
+/** Seen from above, like in a pond: swims in waves, wags its tail and leaves bubbles. */
+class Fish(d: Float, rnd: Random, bodyColor: Long, finColor: Long) : Runner(d, rnd) {
+    override val minSpeed = 110f
+    override val maxSpeed = 380f
+    override val turnRate = 2.8f
+    override val pauseChance = 0.4f
+    override val pauseMin = 0.5f
+    override val pauseMax = 1.8f
+    override val hideChance = 0.15f
+    override val hitRadius = 36 * d
+
+    private val body = fill(bodyColor)
+    private val fin = fill(finColor)
+    private val highlight = fill(0x40FFFFFF)
+    private val eyeWhite = fill(0xFFFFFFFF)
+    private val pupil = fill(0xFF111111)
+    private val bubble = stroke(0x99FFFFFF, 1.5f * d)
+    private val path = Path()
+
+    private val bubbleCount = 8
+    private val bx = FloatArray(bubbleCount)
+    private val by = FloatArray(bubbleCount)
+    private val bLife = FloatArray(bubbleCount)
+    private var nextBubble = 0
+    private var bubbleIn = 0.5f
+
+    override fun wobble(dt: Float) = sin(time * 4f) * 1.3f * dt
+
+    override fun spawn(w: Float, h: Float) {
+        super.spawn(w, h)
+        bLife.fill(0f)
+    }
+
+    override fun update(dt: Float, w: Float, h: Float) {
+        super.update(dt, w, h)
+        bubbleIn -= dt
+        if (bubbleIn <= 0f) {
+            bubbleIn = 0.4f + rnd.nextFloat() * 0.8f
+            bx[nextBubble] = x + cos(heading) * 22 * d
+            by[nextBubble] = y + sin(heading) * 22 * d
+            bLife[nextBubble] = 1.5f
+            nextBubble = (nextBubble + 1) % bubbleCount
+        }
+        for (i in 0 until bubbleCount) {
+            if (bLife[i] <= 0f) continue
+            bLife[i] -= dt
+            by[i] -= 30 * d * dt
+            bx[i] += sin(time * 6f + i) * 12 * d * dt
+        }
+    }
+
+    override fun draw(c: Canvas) {
+        val s = d
+        for (i in 0 until bubbleCount) {
+            if (bLife[i] <= 0f) continue
+            bubble.alpha = (153 * (bLife[i] / 1.5f)).toInt()
+            c.drawCircle(bx[i], by[i], (2 + (1.5f - bLife[i]) * 3) * s, bubble)
+        }
+
+        c.save()
+        c.translate(x, y)
+        c.rotate(heading * 180f / PI_F)
+
+        val sway = sin(time * (4f + 10f * motion)) * 25f
+        c.save()
+        c.translate(-20 * s, 0f)
+        c.rotate(sway)
+        path.reset()
+        path.moveTo(0f, 0f)
+        path.quadTo(-14 * s, -4 * s, -24 * s, -15 * s)
+        path.lineTo(-18 * s, 0f)
+        path.lineTo(-24 * s, 15 * s)
+        path.quadTo(-14 * s, 4 * s, 0f, 0f)
+        c.drawPath(path, fin)
+        c.restore()
+
+        for (side in intArrayOf(-1, 1)) {
+            c.save()
+            c.translate(6 * s, side * 10 * s)
+            c.rotate(side * (35f + sin(time * 8f) * 20f))
+            c.drawOval(-11 * s, -4 * s, 3 * s, 4 * s, fin)
+            c.restore()
+        }
+
+        c.drawOval(-24 * s, -12 * s, 26 * s, 12 * s, body)
+        c.drawOval(-14 * s, -4 * s, 14 * s, 4 * s, highlight)
+        for (side in intArrayOf(-1, 1)) {
+            c.drawCircle(15 * s, side * 7 * s, 3.2f * s, eyeWhite)
+            c.drawCircle(16 * s, side * 7 * s, 1.8f * s, pupil)
+        }
+        c.restore()
+    }
+}

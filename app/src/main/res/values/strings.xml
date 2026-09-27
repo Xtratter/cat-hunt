@@ -1,5 +1,27 @@
 <resources>
     <string name="app_name">Кошачья охота</string>
     <string name="press_back_again">Нажмите «Назад» ещё раз, чтобы выйти</string>
-    <string name="hint_exit">Двойное нажатие «Назад» — выход</string>
+    <string name="hint_exit">«Назад» дважды — выход · удерживайте ⚙ — настройки</string>
+    <string name="hold_for_settings">Удерживайте ⚙, чтобы открыть настройки</string>
+    <string name="settings">Настройки</string>
+    <string name="settings_gear">⚙</string>
+    <string name="section_critters">Кто бегает</string>
+    <string name="critter_mice">🐭 Мышки</string>
+    <string name="critter_roach">🪳 Таракашка</string>
+    <string name="critter_rope">🧶 Верёвочка</string>
+    <string name="critter_butterfly">🦋 Бабочка</string>
+    <string name="critter_fish">🐟 Рыбка</string>
+    <string name="critter_laser">🔴 Лазерная точка</string>
+    <string name="section_game">Игра</string>
+    <string name="speed">Скорость: %1$.1f×</string>
+    <string name="size">Размер: %1$.1f×</string>
+    <string name="section_effects">Звук и эффекты</string>
+    <string name="volume">Громкость: %1$d%%</string>
+    <string name="lure">Звуки-приманки (пс-пс, щебет)</string>
+    <string name="flash">Вспышка при поимке</string>
+    <string name="show_score">Показывать счёт</string>
+    <string name="reset_score">Сбросить счёт</string>
+    <string name="score_reset">Счёт сброшен</string>
+    <string name="done">Готово</string>
+    <string name="version">Версия %1$s</string>
 </resources>
