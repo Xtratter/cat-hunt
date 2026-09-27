@@ -1,0 +1,25 @@
+Categories:
+  - Games
+License: GPL-3.0-or-later
+AuthorName: Xtratter
+SourceCode: https://github.com/Xtratter/cat-hunt
+IssueTracker: https://github.com/Xtratter/cat-hunt/issues
+Changelog: https://github.com/Xtratter/cat-hunt/blob/HEAD/CHANGELOG.md
+
+AutoName: Кошачья охота
+
+RepoType: git
+Repo: https://github.com/Xtratter/cat-hunt.git
+
+Builds:
+  - versionName: '1.3'
+    versionCode: 4
+    commit: 67e072f845dce6826f2b7bcdb5cdc84f771f962c
+    subdir: app
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '1.3'
+CurrentVersionCode: 4
