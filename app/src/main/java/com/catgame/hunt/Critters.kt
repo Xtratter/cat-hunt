@@ -1,0 +1,335 @@
+package com.catgame.hunt
+
+import android.graphics.Canvas
+import android.graphics.DashPathEffect
+import android.graphics.Paint
+import android.graphics.Path
+import java.util.Random
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.max
+import kotlin.math.sin
+
+private const val PI_F = PI.toFloat()
+
+private fun fill(color: Long) = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = color.toInt() }
+
+private fun stroke(color: Long, width: Float) = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    this.color = color.toInt()
+    style = Paint.Style.STROKE
+    strokeWidth = width
+    strokeCap = Paint.Cap.ROUND
+    strokeJoin = Paint.Join.ROUND
+}
+
+/** Anything on screen the cat can catch. Sizes and speeds are in dp, scaled by [d]. */
+abstract class Critter(protected val d: Float, protected val rnd: Random) {
+    var x = 0f
+    var y = 0f
+    var alive = false
+    var respawnIn = 0f
+    var voiceIn = 2f
+    protected var time = 0f
+
+    abstract val hitRadius: Float
+    open fun hitTest(tx: Float, ty: Float, slack: Float) = hypot(tx - x, ty - y) < hitRadius + slack
+    fun onScreen(w: Float, h: Float) = x in 0f..w && y in 0f..h
+
+    abstract fun spawn(w: Float, h: Float)
+    abstract fun update(dt: Float, w: Float, h: Float)
+    abstract fun draw(c: Canvas)
+}
+
+/**
+ * Stop-and-go movement: dash to a random point, sometimes freeze, sometimes run off-screen
+ * and hide for a moment before coming back. Cats love exactly that.
+ */
+abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
+    protected abstract val minSpeed: Float
+    protected abstract val maxSpeed: Float
+    protected abstract val turnRate: Float
+    protected abstract val pauseChance: Float
+    protected abstract val pauseMin: Float
+    protected abstract val pauseMax: Float
+    protected abstract val hideChance: Float
+
+    var heading = 0f
+    var speed = 0f
+    /** Set for one frame when the critter starts running after a pause or hiding. */
+    var startedDash = false
+
+    private var tx = 0f
+    private var ty = 0f
+    private var targetSpeed = 0f
+    private var offTarget = false
+    private var pauseLeft = 0f
+    private var hiddenLeft = 0f
+    private var legTime = 0f
+
+    protected val motion get() = (speed / (maxSpeed * d)).coerceIn(0f, 1f)
+
+    override fun spawn(w: Float, h: Float) {
+        val m = 70 * d
+        when (rnd.nextInt(4)) {
+            0 -> { x = -m; y = rnd.nextFloat() * h }
+            1 -> { x = w + m; y = rnd.nextFloat() * h }
+            2 -> { x = rnd.nextFloat() * w; y = -m }
+            else -> { x = rnd.nextFloat() * w; y = h + m }
+        }
+        time = 0f
+        pauseLeft = 0f
+        hiddenLeft = 0f
+        pickTarget(w, h, allowHide = false)
+        heading = atan2(ty - y, tx - x)
+        speed = targetSpeed
+    }
+
+    private fun pickTarget(w: Float, h: Float, allowHide: Boolean) {
+        legTime = 0f
+        offTarget = allowHide && rnd.nextFloat() < hideChance
+        if (offTarget) {
+            val o = 90 * d
+            when (rnd.nextInt(4)) {
+                0 -> { tx = -o; ty = rnd.nextFloat() * h }
+                1 -> { tx = w + o; ty = rnd.nextFloat() * h }
+                2 -> { tx = rnd.nextFloat() * w; ty = -o }
+                else -> { tx = rnd.nextFloat() * w; ty = h + o }
+            }
+        } else {
+            val m = 60 * d
+            tx = m + rnd.nextFloat() * max(1f, w - 2 * m)
+            ty = m + rnd.nextFloat() * max(1f, h - 2 * m)
+        }
+        targetSpeed = (minSpeed + rnd.nextFloat() * (maxSpeed - minSpeed)) * d
+    }
+
+    protected open fun wobble(dt: Float) = 0f
+
+    override fun update(dt: Float, w: Float, h: Float) {
+        time += dt
+        startedDash = false
+        if (hiddenLeft > 0f) {
+            hiddenLeft -= dt
+            if (hiddenLeft <= 0f) {
+                pickTarget(w, h, allowHide = false)
+                startedDash = true
+            }
+            return
+        }
+        val dx = tx - x
+        val dy = ty - y
+        val dist = hypot(dx, dy)
+        if (pauseLeft > 0f) {
+            pauseLeft -= dt
+            speed = max(0f, speed - 2500 * d * dt)
+            if (pauseLeft <= 0f) {
+                pickTarget(w, h, allowHide = true)
+                startedDash = true
+            }
+        } else {
+            legTime += dt
+            if (dist < 26 * d || legTime > 5f) {
+                if (offTarget && dist < 26 * d) {
+                    hiddenLeft = 0.8f + rnd.nextFloat() * 2.2f
+                    speed = 0f
+                    return
+                }
+                if (rnd.nextFloat() < pauseChance) {
+                    pauseLeft = pauseMin + rnd.nextFloat() * (pauseMax - pauseMin)
+                } else {
+                    pickTarget(w, h, allowHide = true)
+                }
+            }
+            var diff = atan2(dy, dx) - heading
+            while (diff > PI_F) diff -= 2 * PI_F
+            while (diff < -PI_F) diff += 2 * PI_F
+            val maxTurn = turnRate * dt
+            heading += diff.coerceIn(-maxTurn, maxTurn) + wobble(dt)
+            // Slow down near the target and in sharp turns so we don't orbit it.
+            val slow = (dist / (80 * d)).coerceIn(0.35f, 1f) * (if (abs(diff) > 1.2f) 0.45f else 1f)
+            val accel = 3000 * d * dt
+            speed += (targetSpeed * slow - speed).coerceIn(-accel, accel)
+        }
+        x += cos(heading) * speed * dt
+        y += sin(heading) * speed * dt
+    }
+}
+
+class Mouse(d: Float, rnd: Random, furColor: Long) : Runner(d, rnd) {
+    override val minSpeed = 170f
+    override val maxSpeed = 480f
+    override val turnRate = 6.5f
+    override val pauseChance = 0.55f
+    override val pauseMin = 0.4f
+    override val pauseMax = 2.2f
+    override val hideChance = 0.15f
+    override val hitRadius = 40 * d
+
+    private val fur = fill(furColor)
+    private val pink = fill(0xFFF4A6B8)
+    private val eye = fill(0xFF111111)
+    private val shine = fill(0xFFFFFFFF)
+    private val tail = stroke(0xFFE8A0B0, 3.5f * d)
+    private val whisker = stroke(0xAAFFFFFF, 1f * d)
+    private val path = Path()
+
+    override fun draw(c: Canvas) {
+        val s = d
+        c.save()
+        c.translate(x, y)
+        c.rotate(heading * 180f / PI_F)
+
+        val wig = sin(time * 10f) * (0.3f + motion) * 14f * s
+        path.reset()
+        path.moveTo(-26 * s, 0f)
+        path.cubicTo(-45 * s, wig, -60 * s, -wig, -80 * s, wig * 0.5f)
+        c.drawPath(path, tail)
+
+        val step = sin(time * 25f) * motion * 5f * s
+        c.drawCircle(12 * s + step, -14 * s, 4 * s, pink)
+        c.drawCircle(12 * s - step, 14 * s, 4 * s, pink)
+        c.drawCircle(-16 * s - step, -14 * s, 4 * s, pink)
+        c.drawCircle(-16 * s + step, 14 * s, 4 * s, pink)
+
+        c.drawOval(-30 * s, -16 * s, 22 * s, 16 * s, fur)
+        c.drawOval(6 * s, -13 * s, 40 * s, 13 * s, fur)
+
+        for (side in intArrayOf(-1, 1)) {
+            c.drawCircle(13 * s, side * 13 * s, 9 * s, fur)
+            c.drawCircle(13 * s, side * 13 * s, 5.5f * s, pink)
+            c.drawCircle(30 * s, side * 6 * s, 2.6f * s, eye)
+            c.drawCircle(30.8f * s, side * 6.6f * s, 0.9f * s, shine)
+            c.drawLine(37 * s, side * 2 * s, 52 * s, side * 10 * s, whisker)
+            c.drawLine(37 * s, side * 2 * s, 53 * s, side * 3 * s, whisker)
+        }
+        c.drawCircle(40 * s, 0f, 3 * s, pink)
+        c.restore()
+    }
+}
+
+class Roach(d: Float, rnd: Random) : Runner(d, rnd) {
+    override val minSpeed = 250f
+    override val maxSpeed = 650f
+    override val turnRate = 9f
+    override val pauseChance = 0.4f
+    override val pauseMin = 0.2f
+    override val pauseMax = 1.2f
+    override val hideChance = 0.2f
+    override val hitRadius = 32 * d
+
+    private val shell = fill(0xFF8A4B26)
+    private val head = fill(0xFF3E2010)
+    private val seam = stroke(0xFF4A2512, 1.5f * d)
+    private val leg = stroke(0xFF5A3018, 2f * d)
+    private val antenna = stroke(0xFF6B3A1C, 1.5f * d)
+    private val path = Path()
+
+    override fun wobble(dt: Float) = (rnd.nextFloat() - 0.5f) * 9f * dt + sin(time * 11f) * 1.2f * dt
+
+    override fun draw(c: Canvas) {
+        val s = d
+        c.save()
+        c.translate(x, y)
+        c.rotate(heading * 180f / PI_F)
+
+        for (side in intArrayOf(-1, 1)) {
+            for (k in 0..2) {
+                val phase = time * 30f + k * PI_F + (if (side > 0) PI_F else 0f)
+                val swing = sin(phase) * 6f * s * (0.2f + motion)
+                val bx = (-8 + k * 9) * s
+                path.reset()
+                path.moveTo(bx, side * 8 * s)
+                path.lineTo(bx + swing * 0.5f, side * 17 * s)
+                path.lineTo(bx + swing + (k - 1) * 8 * s, side * 25 * s)
+                c.drawPath(path, leg)
+            }
+            val wave = sin(time * 7f + side) * 5f
+            path.reset()
+            path.moveTo(22 * s, side * 3 * s)
+            path.cubicTo(34 * s, side * (6 + wave) * s, 42 * s, side * (14 + wave) * s, 54 * s, side * (8 + wave * 1.5f) * s)
+            c.drawPath(path, antenna)
+        }
+
+        c.drawOval(-22 * s, -11 * s, 16 * s, 11 * s, shell)
+        c.drawLine(-20 * s, 0f, 12 * s, 0f, seam)
+        c.drawOval(12 * s, -7 * s, 25 * s, 7 * s, head)
+        c.restore()
+    }
+}
+
+/** A string/rope whose head wanders like a snake and whose body trails behind. */
+class Rope(d: Float, rnd: Random, color: Long, stripeColor: Long, outlineColor: Long) : Runner(d, rnd) {
+    override val minSpeed = 150f
+    override val maxSpeed = 420f
+    override val turnRate = 3.5f
+    override val pauseChance = 0.35f
+    override val pauseMin = 0.3f
+    override val pauseMax = 1.4f
+    override val hideChance = 0.2f
+    override val hitRadius = 26 * d
+
+    private val n = 24
+    private val seg = 8 * d
+    private val px = FloatArray(n)
+    private val py = FloatArray(n)
+
+    private val outline = stroke(outlineColor, 11 * d)
+    private val body = stroke(color, 7 * d)
+    private val stripe = stroke(stripeColor, 3 * d).apply {
+        pathEffect = DashPathEffect(floatArrayOf(6 * d, 7 * d), 0f)
+        strokeCap = Paint.Cap.BUTT
+    }
+    private val knot = fill(color)
+    private val tassel = stroke(color, 3 * d)
+    private val path = Path()
+
+    override fun wobble(dt: Float) = sin(time * 5f) * 2.2f * dt
+
+    override fun spawn(w: Float, h: Float) {
+        super.spawn(w, h)
+        px.fill(x)
+        py.fill(y)
+    }
+
+    override fun update(dt: Float, w: Float, h: Float) {
+        super.update(dt, w, h)
+        px[0] = x
+        py[0] = y
+        for (i in 1 until n) {
+            val dx = px[i] - px[i - 1]
+            val dy = py[i] - py[i - 1]
+            val dist = hypot(dx, dy)
+            if (dist > seg) {
+                px[i] = px[i - 1] + dx / dist * seg
+                py[i] = py[i - 1] + dy / dist * seg
+            }
+        }
+    }
+
+    override fun hitTest(tx: Float, ty: Float, slack: Float): Boolean {
+        for (i in 0 until n) if (hypot(tx - px[i], ty - py[i]) < hitRadius + slack) return true
+        return false
+    }
+
+    override fun draw(c: Canvas) {
+        path.reset()
+        path.moveTo(px[0], py[0])
+        for (i in 1 until n - 1) {
+            path.quadTo(px[i], py[i], (px[i] + px[i + 1]) / 2, (py[i] + py[i + 1]) / 2)
+        }
+        path.lineTo(px[n - 1], py[n - 1])
+        c.drawPath(path, outline)
+        c.drawPath(path, body)
+        c.drawPath(path, stripe)
+        c.drawCircle(px[0], py[0], 7 * d, knot)
+
+        val ang = atan2(py[n - 1] - py[n - 2], px[n - 1] - px[n - 2])
+        for (k in -2..2) {
+            val a = ang + k * 0.25f + sin(time * 9f + k) * 0.15f
+            c.drawLine(px[n - 1], py[n - 1], px[n - 1] + cos(a) * 16 * d, py[n - 1] + sin(a) * 16 * d, tassel)
+        }
+    }
+}

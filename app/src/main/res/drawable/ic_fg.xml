@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- tail -->
+    <path android:pathData="M34,62 C24,64 22,74 30,78 C36,81 41,76 37,72"
+        android:strokeColor="#F4A6B8" android:strokeWidth="3" android:strokeLineCap="round" />
+    <!-- body -->
+    <path android:fillColor="#BDBDBD" android:pathData="M32,61 a22,14 0 1,0 44,0 a22,14 0 1,0 -44,0" />
+    <!-- head -->
+    <path android:fillColor="#BDBDBD" android:pathData="M62,55 a13,10 0 1,0 26,0 a13,10 0 1,0 -26,0" />
+    <!-- ear -->
+    <path android:fillColor="#BDBDBD" android:pathData="M62,44 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+    <path android:fillColor="#F4A6B8" android:pathData="M65.5,44 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0" />
+    <!-- eye and nose -->
+    <path android:fillColor="#111111" android:pathData="M77,52 a2.2,2.2 0 1,0 4.4,0 a2.2,2.2 0 1,0 -4.4,0" />
+    <path android:fillColor="#F48FB1" android:pathData="M85.5,56 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+    <!-- sparkle -->
+    <path android:fillColor="#FFEB3B" android:pathData="M40,30 L42,37 L49,39 L42,41 L40,48 L38,41 L31,39 L38,37 Z" />
+</vector>

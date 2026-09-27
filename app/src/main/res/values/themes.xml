@@ -1,0 +1,5 @@
+<resources>
+    <style name="GameTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/ic_bg</item>
+    </style>
+</resources>
