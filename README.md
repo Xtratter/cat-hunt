@@ -4,6 +4,8 @@ Android-игра для кошек. По экрану бегают мышки и
 порхает бабочка, плавает рыбка и носится лазерная точка. Звучат привлекающие кошек звуки,
 а если кошка поймала добычу — вспышка и салют из искр.
 
+![Кошачья охота](fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
+
 ## Скачать
 
 Готовые APK — в разделе [Releases](https://github.com/Xtratter/cat-hunt/releases). Нужен Android 8.0 или новее.
