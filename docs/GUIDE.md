@@ -364,6 +364,27 @@ app/src/main/res/layout/activity_main.xml   ← разметка меню нас
 | Список изменений версии | `fastlane/metadata/android/<язык>/changelogs/<versionCode>.txt` |
 | Заявка для F-Droid | `docs/fdroid/io.github.xtratter.cathunt.yml` |
 
+### Заявка
+
+> [!NOTE]
+> **Отправлена 27.09.2026:** [fdroiddata!50354](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50354)
+> (аккаунт GitLab — **Xtratter**, вход через `glab`).
+
+Посмотреть статус и комментарии рецензентов:
+```sh
+glab mr view 50354 -R fdroid/fdroiddata --comments
+```
+
+> [!TIP]
+> **Проверки (CI) не запускаются — «user not being verified».**
+> GitLab требует подтвердить личность новых аккаунтов. По правилам F-Droid подтверждать не нужно —
+> достаточно комментария в заявке, проверки запустят мейнтейнеры.
+
+> [!WARNING]
+> **Токен GitLab действует неделю.** Если рецензенты напишут позже — создайте новый токен
+> (права `api`, `write_repository`) и войдите заново:
+> `glab auth login --hostname gitlab.com --token glpat-…` (с префиксом `glpat-`!)
+
 ### Новая версия после попадания в F-Droid
 
 Всё то же, что в разделе 8, плюс **перед коммитом** создать файлы списка изменений:
