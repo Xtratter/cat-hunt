@@ -375,6 +375,11 @@ app/src/main/res/layout/activity_main.xml   ← разметка меню нас
 glab mr view 50354 -R fdroid/fdroiddata --comments
 ```
 
+Ежедневная проверка (10:07) обновляет заметку `Статус заявки F-Droid.md` в «Загрузках».
+Скрипт — `/usr/local/bin/fdroid-mr-check`, расписание — `/etc/cron.d/fdroid-mr-check`.
+Проверить прямо сейчас: `fdroid-mr-check`. Если телефон перезагружался, `cron` поднимется
+при первом входе в терминал (строка в `~/.bashrc`).
+
 > [!TIP]
 > **Проверки (CI) не запускаются — «user not being verified».**
 > GitLab требует подтвердить личность новых аккаунтов. По правилам F-Droid подтверждать не нужно —
