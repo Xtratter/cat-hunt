@@ -333,3 +333,108 @@ class Rope(d: Float, rnd: Random, color: Long, stripeColor: Long, outlineColor: 
         }
     }
 }
+
+/** Seen from above: wings flap by squashing their span. Flutters erratically and sometimes lands. */
+class Butterfly(d: Float, rnd: Random, foreColor: Long, hindColor: Long) : Runner(d, rnd) {
+    override val minSpeed = 90f
+    override val maxSpeed = 260f
+    override val turnRate = 3f
+    override val pauseChance = 0.45f
+    override val pauseMin = 0.8f
+    override val pauseMax = 2.5f
+    override val hideChance = 0.2f
+    override val hitRadius = 34 * d
+
+    private val fore = fill(foreColor)
+    private val hind = fill(hindColor)
+    private val edge = stroke(0xFF1A1A1A, 2f * d)
+    private val spot = fill(0xFFFFFFFF)
+    private val body = fill(0xFF1A1A1A)
+    private val antenna = stroke(0xFF1A1A1A, 1.2f * d)
+    private var flapPhase = 0f
+
+    override fun wobble(dt: Float) = sin(time * 3f) * 1.5f * dt + (rnd.nextFloat() - 0.5f) * 4f * dt
+
+    override fun update(dt: Float, w: Float, h: Float) {
+        super.update(dt, w, h)
+        flapPhase += dt * (3f + 15f * motion)
+    }
+
+    override fun draw(c: Canvas) {
+        val s = d
+        c.save()
+        c.translate(x, y)
+        c.rotate(heading * 180f / PI_F)
+        for (side in intArrayOf(-1, 1)) {
+            c.save()
+            c.scale(1f, 0.2f + 0.8f * abs(sin(flapPhase)))
+            val far = side * 30 * s
+            val hindFar = side * 22 * s
+            c.drawOval(-18 * s, minOf(0f, hindFar), 4 * s, maxOf(0f, hindFar), hind)
+            c.drawOval(-18 * s, minOf(0f, hindFar), 4 * s, maxOf(0f, hindFar), edge)
+            c.drawOval(-3 * s, minOf(0f, far), 22 * s, maxOf(0f, far), fore)
+            c.drawOval(-3 * s, minOf(0f, far), 22 * s, maxOf(0f, far), edge)
+            c.drawCircle(12 * s, side * 22 * s, 3 * s, spot)
+            c.drawCircle(-9 * s, side * 15 * s, 2.2f * s, spot)
+            c.restore()
+        }
+        c.drawOval(-16 * s, -3 * s, 16 * s, 3 * s, body)
+        for (side in intArrayOf(-1, 1)) {
+            c.drawLine(15 * s, 0f, 27 * s, side * 8 * s, antenna)
+            c.drawCircle(27 * s, side * 8 * s, 1.8f * s, body)
+        }
+        c.restore()
+    }
+}
+
+/** Very fast red dot with sharp stops, a glowing trail and a hand-held tremor. */
+class LaserDot(d: Float, rnd: Random) : Runner(d, rnd) {
+    override val minSpeed = 300f
+    override val maxSpeed = 1100f
+    override val turnRate = 20f
+    override val pauseChance = 0.6f
+    override val pauseMin = 0.15f
+    override val pauseMax = 1f
+    override val hideChance = 0.1f
+    override val hitRadius = 28 * d
+
+    private val trailLen = 10
+    private val trailX = FloatArray(trailLen)
+    private val trailY = FloatArray(trailLen)
+    private val halo = fill(0x55FF1744)
+    private val glow = fill(0xAAFF1744)
+    private val core = fill(0xFFFF1744)
+    private val center = fill(0xFFFFF0F0)
+    private val trail = fill(0xFFFF1744)
+
+    override fun spawn(w: Float, h: Float) {
+        super.spawn(w, h)
+        trailX.fill(x)
+        trailY.fill(y)
+    }
+
+    override fun update(dt: Float, w: Float, h: Float) {
+        super.update(dt, w, h)
+        for (i in trailLen - 1 downTo 1) {
+            trailX[i] = trailX[i - 1]
+            trailY[i] = trailY[i - 1]
+        }
+        trailX[0] = x
+        trailY[0] = y
+    }
+
+    override fun draw(c: Canvas) {
+        val s = d
+        for (i in 1 until trailLen) {
+            val k = 1f - i.toFloat() / trailLen
+            trail.alpha = (120 * k).toInt()
+            c.drawCircle(trailX[i], trailY[i], 5 * s * k, trail)
+        }
+        val jx = x + sin(time * 37f) * 1.2f * s
+        val jy = y + cos(time * 29f) * 1.2f * s
+        c.drawCircle(jx, jy, 18 * s, halo)
+        c.drawCircle(jx, jy, 10 * s, glow)
+        c.drawCircle(jx, jy, 6 * s, core)
+        c.drawCircle(jx, jy, 2.5f * s, center)
+    }
+}

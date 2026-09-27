@@ -66,7 +66,8 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
             critters += Roach(d, rnd)
             critters += Rope(d, rnd, 0xFFFF3D3D, 0xFFFFA0A0, 0xFF5A0000)
             critters += Mouse(d, rnd, 0xFFE8DCC8)
-            critters += Rope(d, rnd, 0xFFFFD600, 0xFFFFF59D, 0xFF6D5A00)
+            critters += Butterfly(d, rnd, 0xFFFF8F00, 0xFFFFC107)
+            critters += LaserDot(d, rnd)
             critters.forEachIndexed { i, c -> c.respawnIn = 0.5f + i * 2.5f }
         }
     }
@@ -149,7 +150,7 @@ class GameView(context: Context, private val sounds: Sounds) : View(context) {
         when (c) {
             is Mouse -> sounds.play(sounds.squeak, 1f, pan(c))
             is Roach -> sounds.play(sounds.rustle, 0.9f, pan(c))
-            is Rope -> sounds.play(sounds.chirp, 0.7f, pan(c))
+            is Rope, is Butterfly -> sounds.play(sounds.chirp, 0.7f, pan(c))
         }
     }
 
