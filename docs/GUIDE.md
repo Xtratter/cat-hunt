@@ -31,7 +31,8 @@ updated: 2026-09-27
 | Глобальные настройки Gradle | `~/.gradle/gradle.properties` |
 | Пример проекта | `/root/HelloAndroid` |
 | Игра «Кошачья охота» | `/root/CatGame` |
-| APK всех версий игры | `/root/releases` |
+| Монитор процессов DroidTop | `/root/DroidTop` → [github.com/Xtratter/droidtop](https://github.com/Xtratter/droidtop) |
+| APK всех версий (игра и DroidTop) | `/root/releases` |
 | Готовые APK для установки | `/sdcard/Download` |
 
 > [!WARNING]
