@@ -320,7 +320,7 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
 ## 9. «Кошачья охота»: как устроен код
 
 ```
-app/src/main/java/com/catgame/hunt/
+app/src/main/java/io/github/xtratter/cathunt/
 ├── MainActivity.kt   ← экран, полноэкранный режим, меню настроек, выход по двойному «Назад»
 ├── GameView.kt       ← игровой цикл, касания, вспышки и искры, кто когда пищит
 ├── Critters.kt       ← все зверьки: Mouse, Roach, Rope, Butterfly, LaserDot, Fish
@@ -342,3 +342,49 @@ app/src/main/res/layout/activity_main.xml   ← разметка меню нас
 
 Открывается **удержанием** ⚙ в правом верхнем углу (от случайного нажатия лапой).
 Настройки сохраняются между запусками.
+
+---
+
+## 10. F-Droid
+
+> [!NOTE]
+> **Как это устроено.**
+> F-Droid не берёт готовый APK: его сервер сам скачивает код с GitHub, собирает и подписывает
+> **своим** ключом. Поэтому версия из F-Droid и версия с GitHub не ставятся друг поверх друга —
+> пользователь выбирает один источник.
+
+### Что уже готово в репозитории
+
+| Что | Где |
+|---|---|
+| Лицензия GPL-3.0 | `LICENSE` |
+| Идентификатор | `io.github.xtratter.cathunt` |
+| Описания для каталога (ru, en) | `fastlane/metadata/android/<язык>/` |
+| Иконка 512×512 | `fastlane/metadata/android/en-US/images/icon.png` |
+| Список изменений версии | `fastlane/metadata/android/<язык>/changelogs/<versionCode>.txt` |
+| Заявка для F-Droid | `docs/fdroid/io.github.xtratter.cathunt.yml` |
+
+### Новая версия после попадания в F-Droid
+
+Всё то же, что в разделе 8, плюс **перед коммитом** создать файлы списка изменений:
+
+```sh
+# versionCode новой версии, например 5
+nano fastlane/metadata/android/ru-RU/changelogs/5.txt
+nano fastlane/metadata/android/en-US/changelogs/5.txt
+```
+
+F-Droid сам заметит новый тег `vX.Y` и через несколько дней выпустит обновление.
+
+> [!IMPORTANT]
+> **Никогда не удаляйте и не переставляйте опубликованные теги.**
+> F-Droid собирает версии именно по тегам.
+
+### Скриншоты
+
+Кладите PNG в `fastlane/metadata/android/en-US/images/phoneScreenshots/`
+(имена `1.png`, `2.png`, … — порядок показа).
+
+> [!CAUTION]
+> **Нельзя добавлять в проект закрытые библиотеки** (Google Play Services, Firebase, реклама, аналитика) —
+> F-Droid откажет или пометит приложение предупреждением (anti-feature).

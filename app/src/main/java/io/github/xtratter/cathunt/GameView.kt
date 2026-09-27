@@ -1,4 +1,4 @@
-package com.catgame.hunt
+package io.github.xtratter.cathunt
 
 import android.annotation.SuppressLint
 import android.content.Context

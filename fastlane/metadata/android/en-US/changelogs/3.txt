@@ -1,0 +1,3 @@
+• Fish with bubbles and a "bloop" sound
+• Settings menu: long-press ⚙ in the top-right corner
+• Settings are saved between launches

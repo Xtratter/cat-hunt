@@ -1,0 +1,21 @@
+<p>A game for your cat. Put the phone on the floor and let the hunt begin!</p>
+
+<p>Things that run, fly and swim across the screen:</p>
+<ul>
+<li>🐭 mice — dash, freeze and hide behind the screen edge;</li>
+<li>🪳 a cockroach — fast and zigzagging;</li>
+<li>🧶 a string — wriggles like a snake;</li>
+<li>🦋 a butterfly — flutters and sometimes lands;</li>
+<li>🐟 a fish — swims in waves and blows bubbles;</li>
+<li>🔴 a laser dot — darts around with sudden stops.</li>
+</ul>
+
+<p>Sounds that attract cats: mouse squeaks, rustling, bird chirps, "pss-pss" and bubbles. When the cat catches something, there is a bright flash, a burst of sparks and a chime.</p>
+
+<p>Settings menu (long-press ⚙ in the top-right corner): choose which critters appear, speed, size, volume, lure sounds, flash and score.</p>
+
+<p>Paw-proof: the screen stays on, system bars are hidden, and exiting requires a double press of Back.</p>
+
+<p>No ads, no internet access, no data collection. All sounds are synthesized by the app itself.</p>
+
+<p>The app interface is currently in Russian.</p>

@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.catgame.hunt"
+    namespace = "io.github.xtratter.cathunt"
     compileSdk = 35
     buildToolsVersion = "35.0.0"
     defaultConfig {
-        applicationId = "com.catgame.hunt"
+        applicationId = "io.github.xtratter.cathunt"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
