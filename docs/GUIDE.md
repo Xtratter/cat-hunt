@@ -265,22 +265,34 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
 1. Внести изменения в код и проверить сборку: `./gradlew assembleDebug`
 2. Поднять версию в `app/build.gradle.kts`:
    ```kotlin
-   versionCode = 4        // целое число, всегда +1
-   versionName = "1.3"    // то, что видит человек
+   versionCode = 6        // целое число, всегда +1
+   versionName = "1.4"    // то, что видит человек
    ```
-3. Дописать, что нового, в начало `CHANGELOG.md`
-4. Собрать, сохранить и опубликовать:
+3. Дописать, что нового, в начало `CHANGELOG.md` и в
+   `fastlane/metadata/android/{ru-RU,en-US}/changelogs/<versionCode>.txt`
+4. Собрать release (с R8), подписать, сохранить и опубликовать:
    ```sh
    cd /root/CatGame
-   ./gradlew assembleDebug
-   cp app/build/outputs/apk/debug/app-debug.apk ~/releases/CatHunt-v1.3.apk
-   cp ~/releases/CatHunt-v1.3.apk /sdcard/Download/
+   ./gradlew assembleRelease
+   BT=/opt/android-sdk/build-tools/35.0.0
+   $BT/zipalign -f -p 4 app/build/outputs/apk/release/app-release-unsigned.apk /tmp/aligned.apk
+   $BT/apksigner sign --ks ~/.config/.android/debug.keystore \
+       --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey \
+       --out ~/releases/CatHunt-v1.4.apk /tmp/aligned.apk
+   cp ~/releases/CatHunt-v1.4.apk /sdcard/Download/
    git add -A
-   git commit -m "Версия 1.3: что изменилось"
-   git tag -a v1.3 -m "Версия 1.3"
+   git commit -m "Версия 1.4: что изменилось"
+   git tag -a v1.4 -m "Версия 1.4"
    git push --follow-tags
-   gh release create v1.3 ~/releases/CatHunt-v1.3.apk -t "Кошачья охота 1.3" -n "Что нового: …"
+   gh release create v1.4 ~/releases/CatHunt-v1.4.apk -t "Кошачья охота 1.4" -n "Что нового: …"
    ```
+
+> [!NOTE]
+> **R8 включён для release-сборки** (`isMinifyEnabled`, `isShrinkResources`,
+> правила — в `app/proguard-rules.pro`). Он удаляет неиспользуемый код и ресурсы
+> и переименовывает классы. Этого требует F-Droid. Если когда-нибудь появится
+> рефлексия или сериализация по именам классов — добавьте `-keep`-правила в `proguard-rules.pro`.
+> После сборки проверьте на телефоне, что игра и меню настроек работают.
 5. Обновить копию этой инструкции для Obsidian:
    ```sh
    cp docs/GUIDE.md "/sdcard/Download/Сборка Android-приложений.md"

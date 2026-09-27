@@ -1,0 +1,1 @@
+• Smaller app: code and resources are optimized with R8
