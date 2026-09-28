@@ -407,9 +407,23 @@ on the first terminal login (a line in `~/.bashrc`).
 > a comment in the request is enough, and the maintainers will run the pipelines.
 
 > [!WARNING]
-> **The GitLab token is valid for a week.** If reviewers reply later, create a new token
+> **The GitLab token `cathunt` expires on 27.10.2026** (check: `glab api personal_access_tokens/self`).
+> After that, create a new token
 > (scopes `api`, `write_repository`) and log in again:
 > `glab auth login --hostname gitlab.com --token glpat-…` (with the `glpat-` prefix!)
+
+### A new version while the request is still open
+
+The reviewers asked to keep the request up to date. After releasing version X.Y (section 8,
+with the changelog files below), one command updates the request:
+
+```sh
+/root/fdroid-tools/update-mr.sh X.Y      # DRY=1 in front — check only, push nothing
+```
+
+It takes the `vX.Y` tag commit and versionCode, rewrites the metadata file, runs `fdroid lint`,
+`rewritemeta` and the schema check with a fresh fdroidserver, commits the file to the fork branch
+and copies it to `docs/fdroid/`. Then commit `docs/fdroid` here and post a short comment in the request.
 
 ### A new version after the app is in F-Droid
 
