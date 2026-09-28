@@ -1,35 +1,37 @@
-# 🐱 Кошачья охота (Cat Hunt)
+# 🐱 Cat Hunt (Кошачья охота)
 
-Android-игра для кошек. По экрану бегают мышки и таракашка, извивается верёвочка,
-порхает бабочка, плавает рыбка и носится лазерная точка. Звучат привлекающие кошек звуки,
-а если кошка поймала добычу — вспышка и салют из искр.
+[Русский](README.ru.md) · **English**
 
-![Кошачья охота](fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
+An Android game for cats. Mice and a cockroach run across the screen, a string wriggles,
+a butterfly flutters, a fish swims and a laser dot zips around. Sounds that attract cats play,
+and when the cat catches its prey, there is a flash and a burst of sparks.
 
-## Скачать
+![Cat Hunt](fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
 
-Готовые APK — в разделе [Releases](https://github.com/Xtratter/cat-hunt/releases). Нужен Android 8.0 или новее.
+## Download
 
-## Как играть
+Ready-made APKs are on the [Releases](https://github.com/Xtratter/cat-hunt/releases) page. Android 8.0 or newer is required.
 
-- Положите телефон на пол, включите звук погромче
-- Меню настроек — **удерживайте ⚙** в правом верхнем углу
-- Выход — двойное нажатие «Назад»
-- Чтобы кошка точно не вышла из игры, включите «Закрепление приложения» в настройках Android
+## How to play
 
-## Для разработчика
+- Put the phone on the floor and turn the sound up
+- Settings menu: **press and hold ⚙** in the top right corner
+- Exit: press "Back" twice
+- To make sure the cat can't leave the game, turn on "App pinning" in the Android settings
 
-- [Инструкция по сборке и выпуску версий](docs/GUIDE.md)
-- [История версий](CHANGELOG.md)
+## For developers
+
+- [Build and release guide](docs/GUIDE.en.md) ([Russian](docs/GUIDE.md))
+- [Changelog](CHANGELOG.md)
 
 ```sh
 ./gradlew assembleDebug
 # → app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Требуется JDK 17 и Android SDK (platform 35, build-tools 35.0.0).
+You need JDK 17 and the Android SDK (platform 35, build-tools 35.0.0).
 
-## Лицензия
+## License
 
-[GNU GPL v3.0 или новее](LICENSE). Код можно свободно использовать и изменять,
-но производные программы тоже должны распространяться с открытым кодом под GPL.
+[GNU GPL v3.0 or later](LICENSE). You are free to use and modify the code,
+but derived programs must also be distributed as open source under the GPL.

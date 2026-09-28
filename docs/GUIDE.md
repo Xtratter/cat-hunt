@@ -6,7 +6,7 @@ tags:
   - kotlin
   - инструкция
 created: 2026-09-27
-updated: 2026-09-27
+updated: 2026-09-28
 ---
 
 # Сборка Android-приложений на телефоне
@@ -18,6 +18,7 @@ updated: 2026-09-27
 >
 > Этот файл живёт в репозитории [cat-hunt](https://github.com/Xtratter/cat-hunt) — `docs/GUIDE.md`,
 > а его копия для Obsidian лежит в «Загрузках»: `Сборка Android-приложений.md`.
+> Английская версия — `docs/GUIDE.en.md`.
 
 ## Что где лежит
 
@@ -258,9 +259,9 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
 > - Аккаунт: **Xtratter**, вход выполнен (`gh auth status`)
 > - Игра: `/root/CatGame` → https://github.com/Xtratter/cat-hunt
 > - Автор коммитов — `Xtratter` со служебной почтой GitHub (gmail не светится)
-> - История изменений — в `CHANGELOG.md`
+> - История изменений — в `CHANGELOG.md` (английский) и `CHANGELOG.ru.md` (русский)
 
-### Выпустить новую версию (пример: 1.3)
+### Выпустить новую версию (пример: 1.4)
 
 1. Внести изменения в код и проверить сборку: `./gradlew assembleDebug`
 2. Поднять версию в `app/build.gradle.kts`:
@@ -268,7 +269,7 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
    versionCode = 6        // целое число, всегда +1
    versionName = "1.4"    // то, что видит человек
    ```
-3. Дописать, что нового, в начало `CHANGELOG.md` и в
+3. Дописать, что нового, в начало `CHANGELOG.md` (по-английски), `CHANGELOG.ru.md` (по-русски) и в
    `fastlane/metadata/android/{ru-RU,en-US}/changelogs/<versionCode>.txt`
 4. Собрать release (с R8), подписать, сохранить и опубликовать:
    ```sh
@@ -281,10 +282,16 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
        --out ~/releases/CatHunt-v1.4.apk /tmp/aligned.apk
    cp ~/releases/CatHunt-v1.4.apk /sdcard/Download/
    git add -A
-   git commit -m "Версия 1.4: что изменилось"
-   git tag -a v1.4 -m "Версия 1.4"
+   git commit -m "Version 1.4: what changed"
+   git tag -a v1.4 -m "Version 1.4"
    git push --follow-tags
-   gh release create v1.4 ~/releases/CatHunt-v1.4.apk -t "Кошачья охота 1.4" -n "Что нового: …"
+   gh release create v1.4 ~/releases/CatHunt-v1.4.apk -t "Cat Hunt 1.4" -F notes.md
+   ```
+   В `notes.md` — сначала список изменений по-английски, потом строка `---`, **Русский** и тот же список по-русски.
+
+5. Обновить копию этой инструкции для Obsidian:
+   ```sh
+   cp docs/GUIDE.md "/sdcard/Download/Сборка Android-приложений.md"
    ```
 
 > [!NOTE]
@@ -293,10 +300,11 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
 > и переименовывает классы. Этого требует F-Droid. Если когда-нибудь появится
 > рефлексия или сериализация по именам классов — добавьте `-keep`-правила в `proguard-rules.pro`.
 > После сборки проверьте на телефоне, что игра и меню настроек работают.
-5. Обновить копию этой инструкции для Obsidian:
-   ```sh
-   cp docs/GUIDE.md "/sdcard/Download/Сборка Android-приложений.md"
-   ```
+
+> [!NOTE]
+> **GitHub ведётся на двух языках.** `README.md`, `CHANGELOG.md` и описания релизов — сначала по-английски,
+> русские версии — `README.ru.md` и `CHANGELOG.ru.md`. Эта инструкция тоже в двух файлах:
+> меняете `docs/GUIDE.md` — поправьте и `docs/GUIDE.en.md`.
 
 > [!IMPORTANT]
 > **`versionCode` только растёт.**
@@ -408,9 +416,9 @@ glab mr view 50354 -R fdroid/fdroiddata --comments
 Всё то же, что в разделе 8, плюс **перед коммитом** создать файлы списка изменений:
 
 ```sh
-# versionCode новой версии, например 5
-nano fastlane/metadata/android/ru-RU/changelogs/5.txt
-nano fastlane/metadata/android/en-US/changelogs/5.txt
+# versionCode новой версии, например 7
+nano fastlane/metadata/android/ru-RU/changelogs/7.txt
+nano fastlane/metadata/android/en-US/changelogs/7.txt
 ```
 
 F-Droid сам заметит новый тег `vX.Y` и через несколько дней выпустит обновление.

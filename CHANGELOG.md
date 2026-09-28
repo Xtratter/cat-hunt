@@ -1,36 +1,38 @@
-# История версий
+# Changelog
+
+[Русский](CHANGELOG.ru.md) · **English**
 
 ## 1.4 — 2026-09-28
-- Приложение стало меньше (≈50 КБ вместо ≈860 КБ): код и ресурсы
-  оптимизируются R8 — так попросили в F-Droid
-- APK на GitHub теперь собирается как release, а не debug
+- The app is much smaller (≈50 KB instead of ≈860 KB): code and resources
+  are optimized by R8, as requested by F-Droid
+- The GitHub APK is now a release build instead of a debug build
 
 ## 1.3.1 — 2026-09-27
-- Скриншоты для каталога F-Droid (игра, поимка, меню настроек)
+- Screenshots for the F-Droid catalog (game, catch, settings menu)
 
 ## 1.3 — 2026-09-27
-- Первая версия для F-Droid
-- Новый идентификатор приложения: `io.github.xtratter.cathunt`.
-  Это отдельное приложение: версию 1.2 и более ранние удалите вручную
-- Лицензия GPL-3.0
-- Описания для каталога на русском и английском
+- First version for F-Droid
+- New application ID: `io.github.xtratter.cathunt`.
+  It is a separate app: uninstall version 1.2 and earlier manually
+- GPL-3.0 license
+- Catalog descriptions in Russian and English
 
 ## 1.2 — 2026-09-27
-- 🐟 Рыбка: плывёт волнами, виляет хвостом, пускает пузырьки, звук «бульк»
-- ⚙ Меню настроек (удерживайте шестерёнку в правом верхнем углу):
-  - какие зверьки бегают
-  - скорость и размер
-  - громкость, звуки-приманки, вспышка, показ счёта, сброс счёта
-- Настройки сохраняются между запусками
-- Монохромная иконка для «тематических значков» Android 13+
+- 🐟 Fish: swims in waves, wags its tail, blows bubbles, makes a "bloop" sound
+- ⚙ Settings menu (press and hold the gear in the top right corner):
+  - which critters appear
+  - speed and size
+  - volume, lure sounds, flash, score display, score reset
+- Settings are kept between launches
+- Monochrome icon for Android 13+ "themed icons"
 
 ## 1.1 — 2026-09-27
-- 🦋 Бабочка: порхает, машет крыльями, иногда садится
-- 🔴 Лазерная точка: носится с резкими остановками, со светящимся следом
-- Жёлтая верёвочка убрана, чтобы на экране не было тесно
+- 🦋 Butterfly: flutters, flaps its wings, sometimes lands
+- 🔴 Laser dot: zips around with sudden stops and a glowing trail
+- The yellow string was removed so the screen is less crowded
 
 ## 1.0 — 2026-09-27
-- 🐭 Две мышки, 🪳 таракашка, 🧶 верёвочки
-- 🔊 Писк, шуршание, щебет и «пс-пс-пс»
-- ✨ Вспышка, искры и звон при поимке
-- Выход — двойное нажатие «Назад»
+- 🐭 Two mice, 🪳 a cockroach, 🧶 strings
+- 🔊 Squeaks, rustling, chirping and "psst-psst-psst"
+- ✨ Flash, sparks and a chime on a catch
+- Exit: press "Back" twice
