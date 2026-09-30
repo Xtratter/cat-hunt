@@ -85,7 +85,7 @@ Then change the package name (for example, to `com.me.myapp`):
    rm -r app/src/main/java/com/example
    sed -i 's/^package com.example.hello/package com.me.myapp/' app/src/main/java/com/me/myapp/*.kt
    ```
-4. The app name shown on screen is in `app/src/main/res/values/strings.xml`
+4. The app name shown on screen is in `app/src/main/res/values/strings.xml` (and `values-ru/` for Russian)
 
 > [!NOTE]
 > **Different `applicationId` = different apps.**
@@ -348,7 +348,13 @@ app/src/main/java/io/github/xtratter/cathunt/
 ├── Sounds.kt         ← sound synthesis (squeak, rustle, chirp, psst, bloop, chime)
 └── Settings.kt       ← saved settings
 app/src/main/res/layout/activity_main.xml   ← settings menu layout
+app/src/main/res/values/strings.xml         ← texts in English (the default language)
+app/src/main/res/values-ru/strings.xml      ← the same texts in Russian
 ```
+
+> [!IMPORTANT]
+> **Add every new text to both `strings.xml` files** (`values/` and `values-ru/`) with the same `name`.
+> Android picks the language from the system settings.
 
 ### Adding a new critter
 

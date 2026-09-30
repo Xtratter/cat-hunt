@@ -18,4 +18,4 @@
 
 <p>No ads, no internet access, no data collection. All sounds are synthesized by the app itself.</p>
 
-<p>The app interface is currently in Russian.</p>
+<p>The interface is in English and Russian and follows the system language.</p>

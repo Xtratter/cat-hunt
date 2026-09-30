@@ -1,0 +1,1 @@
+English interface: the game follows the system language (English or Russian).

@@ -2,6 +2,10 @@
 
 [Русский](CHANGELOG.ru.md) · **English**
 
+## 1.5 — 2026-09-30
+- English interface: the game follows the system language (English or Russian),
+  as suggested by the F-Droid tester
+
 ## 1.4 — 2026-09-28
 - The app is much smaller (≈50 KB instead of ≈860 KB): code and resources
   are optimized by R8, as requested by F-Droid

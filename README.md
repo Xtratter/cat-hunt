@@ -14,9 +14,10 @@ Ready-made APKs are on the [Releases](https://github.com/Xtratter/cat-hunt/relea
 
 ## How to play
 
-- Put the phone on the floor and turn the sound up
+- Put the phone on the floor and turn the sound up (the game uses the media volume)
 - Settings menu: **press and hold ⚙** in the top right corner
 - Exit: press "Back" twice
+- The interface is in English and Russian and follows the system language
 - To make sure the cat can't leave the game, turn on "App pinning" in the Android settings
 
 ## For developers

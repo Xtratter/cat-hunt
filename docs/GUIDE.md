@@ -84,7 +84,7 @@ rm -rf .gradle build app/build
    rm -r app/src/main/java/com/example
    sed -i 's/^package com.example.hello/package com.me.myapp/' app/src/main/java/com/me/myapp/*.kt
    ```
-4. Название приложения на экране — в `app/src/main/res/values/strings.xml`
+4. Название приложения на экране — в `app/src/main/res/values/strings.xml` (и `values-ru/` для русского)
 
 > [!NOTE]
 > **Разный `applicationId` = разные приложения.**
@@ -348,7 +348,13 @@ app/src/main/java/io/github/xtratter/cathunt/
 ├── Sounds.kt         ← синтез звуков (писк, шуршание, щебет, пс-пс, бульк, звон)
 └── Settings.kt       ← сохранённые настройки
 app/src/main/res/layout/activity_main.xml   ← разметка меню настроек
+app/src/main/res/values/strings.xml         ← тексты по-английски (основной язык)
+app/src/main/res/values-ru/strings.xml      ← те же тексты по-русски
 ```
+
+> [!IMPORTANT]
+> **Новый текст — в оба файла `strings.xml`** (`values/` и `values-ru/`) с одинаковым `name`.
+> Язык выбирает Android по настройкам системы.
 
 ### Добавить нового зверька
 
