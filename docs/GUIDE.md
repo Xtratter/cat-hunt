@@ -403,20 +403,21 @@ glab mr view 50354 -R fdroid/fdroiddata --comments
 ```
 
 Ежедневная проверка (10:07) обновляет заметку `Статус заявки F-Droid.md` в «Загрузках».
-Скрипт — `/usr/local/bin/fdroid-mr-check`, расписание — `/etc/cron.d/fdroid-mr-check`.
-Проверить прямо сейчас: `fdroid-mr-check`. Если телефон перезагружался, `cron` поднимется
-при первом входе в терминал (строка в `~/.bashrc`).
+Она работает в Termux: скрипт — `~/projects/tools/fdroid-mr-check.py` (команда `fdroid-mr-check`),
+расписание — `crontab -l`. Проверить прямо сейчас: `fdroid-mr-check`. Если Android выгрузил Termux
+и 10:07 прошло, проверка выполнится при открытии Termux (строки в `~/.bashrc` запускают `crond` и догоняют).
+После нашего ответа в заявке: `fdroid-mr-check --note "что сделали"` — строка в истории.
+Проверка идёт через `glab`, а если он не вошёл — читает открытую заявку без токена.
 
 > [!TIP]
 > **Проверки (CI) не запускаются — «user not being verified».**
 > GitLab требует подтвердить личность новых аккаунтов. По правилам F-Droid подтверждать не нужно —
 > достаточно комментария в заявке, проверки запустят мейнтейнеры.
 
-> [!WARNING]
-> **Токен GitLab `cathunt` действует до 27.10.2026** (проверить: `glab api personal_access_tokens/self`).
-> После этого создайте новый токен
-> (права `api`, `write_repository`) и войдите заново:
-> `glab auth login --hostname gitlab.com --token glpat-…` (с префиксом `glpat-`!)
+> [!NOTE]
+> **glab вошёл по коду устройства, а не по токену** — продлевать ничего не нужно, glab сам обновляет доступ.
+> Войти заново (пакет `glab-cli` в Termux): `glab auth login --hostname gitlab.com --device --git-protocol https`,
+> затем ввести показанный код на https://gitlab.com/oauth/device. Проверить: `glab auth status`.
 
 ### Новая версия, пока заявка ещё открыта
 
@@ -424,12 +425,13 @@ glab mr view 50354 -R fdroid/fdroiddata --comments
 вместе с файлами списка изменений, см. ниже) заявка обновляется одной командой:
 
 ```sh
-/root/fdroid-tools/update-mr.sh X.Y      # с DRY=1 впереди — только проверить, ничего не отправлять
+update-mr X.Y            # DRY=1 update-mr X.Y — только проверить, ничего не отправлять
 ```
 
 Скрипт берёт коммит тега `vX.Y` и versionCode, переписывает файл метаданных, прогоняет `fdroid lint`,
 `rewritemeta` и проверку по схеме свежим fdroidserver, коммитит файл в ветку форка и копирует его
-в `docs/fdroid/`. Потом закоммитьте `docs/fdroid` здесь и напишите короткий комментарий в заявке.
+в `docs/fdroid/`. Инструменты лежат в `~/projects/fdroid-tools/` (fdroidserver master в отдельном
+окружении Python `venv`, схема и категории fdroiddata). Потом закоммитьте `docs/fdroid` здесь и напишите короткий комментарий в заявке.
 
 ### Новая версия после попадания в F-Droid
 

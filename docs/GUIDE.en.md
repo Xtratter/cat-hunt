@@ -403,20 +403,21 @@ glab mr view 50354 -R fdroid/fdroiddata --comments
 ```
 
 A daily check (10:07) updates the note `Статус заявки F-Droid.md` in Downloads.
-The script is `/usr/local/bin/fdroid-mr-check`, the schedule is `/etc/cron.d/fdroid-mr-check`.
-To check right now: `fdroid-mr-check`. If the phone was rebooted, `cron` starts
-on the first terminal login (a line in `~/.bashrc`).
+It runs in Termux: the script is `~/projects/tools/fdroid-mr-check.py` (command `fdroid-mr-check`),
+the schedule is `crontab -l`. To check right now: `fdroid-mr-check`. If Android unloaded Termux and
+10:07 passed, the check runs when you open Termux (lines in `~/.bashrc` start `crond` and catch up).
+After replying in the request: `fdroid-mr-check --note "what we did"` adds a line to the history.
+The check goes through `glab` and, if glab is not logged in, reads the public request without a token.
 
 > [!TIP]
 > **CI pipelines don't run: "user not being verified".**
 > GitLab asks new accounts to verify their identity. F-Droid's rules say you don't have to:
 > a comment in the request is enough, and the maintainers will run the pipelines.
 
-> [!WARNING]
-> **The GitLab token `cathunt` expires on 27.10.2026** (check: `glab api personal_access_tokens/self`).
-> After that, create a new token
-> (scopes `api`, `write_repository`) and log in again:
-> `glab auth login --hostname gitlab.com --token glpat-…` (with the `glpat-` prefix!)
+> [!NOTE]
+> **glab is logged in with a device code, not a token** — nothing to renew by hand, glab refreshes access itself.
+> To log in again (`glab-cli` package in Termux): `glab auth login --hostname gitlab.com --device --git-protocol https`,
+> then enter the shown code at https://gitlab.com/oauth/device. Check: `glab auth status`.
 
 ### A new version while the request is still open
 
@@ -424,12 +425,13 @@ The reviewers asked to keep the request up to date. After releasing version X.Y 
 with the changelog files below), one command updates the request:
 
 ```sh
-/root/fdroid-tools/update-mr.sh X.Y      # DRY=1 in front — check only, push nothing
+update-mr X.Y            # DRY=1 update-mr X.Y — check only, push nothing
 ```
 
 It takes the `vX.Y` tag commit and versionCode, rewrites the metadata file, runs `fdroid lint`,
 `rewritemeta` and the schema check with a fresh fdroidserver, commits the file to the fork branch
-and copies it to `docs/fdroid/`. Then commit `docs/fdroid` here and post a short comment in the request.
+and copies it to `docs/fdroid/`. Tools live in `~/projects/fdroid-tools/` (fdroidserver master in its own
+Python `venv`, fdroiddata schema and categories). Then commit `docs/fdroid` here and post a short comment in the request.
 
 ### A new version after the app is in F-Droid
 
