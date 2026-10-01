@@ -1,5 +1,7 @@
 # 🐱 Кошачья охота (Cat Hunt)
 
+[![Build](https://github.com/Xtratter/cat-hunt/actions/workflows/build.yml/badge.svg)](https://github.com/Xtratter/cat-hunt/actions/workflows/build.yml)
+
 **Русский** · [English](README.md)
 
 Android-игра для кошек. По экрану бегают мышки и таракашка, извивается верёвочка,

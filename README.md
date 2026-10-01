@@ -1,5 +1,7 @@
 # 🐱 Cat Hunt (Кошачья охота)
 
+[![Build](https://github.com/Xtratter/cat-hunt/actions/workflows/build.yml/badge.svg)](https://github.com/Xtratter/cat-hunt/actions/workflows/build.yml)
+
 [Русский](README.ru.md) · **English**
 
 An Android game for cats. Mice and a cockroach run across the screen, a string wriggles,
