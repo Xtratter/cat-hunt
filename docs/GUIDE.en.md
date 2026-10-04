@@ -19,7 +19,7 @@ updated: 2026-09-28
 > Everything needed for building is already installed; internet is only needed to download dependencies.
 >
 > This file lives in the [cat-hunt](https://github.com/Xtratter/cat-hunt) repository as `docs/GUIDE.en.md`.
-> The Russian original is `docs/GUIDE.md`, and its Obsidian copy is in Downloads: `Сборка Android-приложений.md`.
+> The Russian original is `docs/GUIDE.md`, and its Obsidian copy is `/sdcard/claude/notes/Сборка Android-приложений.md`.
 
 ## Where things are
 
@@ -291,7 +291,7 @@ Change `buildToolsVersion` in `app/build.gradle.kts` to `"35.0.0"`.
    `notes.md` holds the list of changes in English, then a `---` line, **Русский** and the same list in Russian.
 5. Update the Obsidian copy of the Russian guide:
    ```sh
-   cp docs/GUIDE.md "/sdcard/Download/Сборка Android-приложений.md"
+   cp docs/GUIDE.md "/sdcard/claude/notes/Сборка Android-приложений.md"
    ```
 
 > [!NOTE]
@@ -320,7 +320,7 @@ Change `buildToolsVersion` in `app/build.gradle.kts` to `"35.0.0"`.
 > **Edited the guide in Obsidian?**
 > Bring the changes back to the repository so they aren't lost:
 > ```sh
-> cp "/sdcard/Download/Сборка Android-приложений.md" /root/CatGame/docs/GUIDE.md
+> cp "/sdcard/claude/notes/Сборка Android-приложений.md" /root/CatGame/docs/GUIDE.md
 > cd /root/CatGame && git diff docs/GUIDE.md
 > git commit -am "Guide: update" && git push
 > ```
@@ -402,7 +402,7 @@ To see the status and reviewer comments:
 glab mr view 50354 -R fdroid/fdroiddata --comments
 ```
 
-A daily check (10:07) updates the note `Статус заявки F-Droid.md` in Downloads.
+A daily check (10:07) updates the note `/sdcard/claude/notes/Статус заявки F-Droid.md`.
 It runs in Termux: the script is `~/projects/tools/fdroid-mr-check.py` (command `fdroid-mr-check`),
 the schedule is `crontab -l`. To check right now: `fdroid-mr-check`. If Android unloaded Termux and
 10:07 passed, the check runs when you open Termux (lines in `~/.bashrc` start `crond` and catch up).

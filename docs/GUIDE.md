@@ -17,7 +17,7 @@ updated: 2026-09-28
 > Всё нужное для сборки уже установлено, интернет нужен только для скачивания зависимостей.
 >
 > Этот файл живёт в репозитории [cat-hunt](https://github.com/Xtratter/cat-hunt) — `docs/GUIDE.md`,
-> а его копия для Obsidian лежит в «Загрузках»: `Сборка Android-приложений.md`.
+> а его копия для Obsidian лежит в `/sdcard/claude/notes/Сборка Android-приложений.md`.
 > Английская версия — `docs/GUIDE.en.md`.
 
 ## Что где лежит
@@ -291,7 +291,7 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
 
 5. Обновить копию этой инструкции для Obsidian:
    ```sh
-   cp docs/GUIDE.md "/sdcard/Download/Сборка Android-приложений.md"
+   cp docs/GUIDE.md "/sdcard/claude/notes/Сборка Android-приложений.md"
    ```
 
 > [!NOTE]
@@ -320,7 +320,7 @@ echo "sdk.dir=/opt/android-sdk" > local.properties
 > **Правили инструкцию в Obsidian?**
 > Верните правки в репозиторий, чтобы не потерять:
 > ```sh
-> cp "/sdcard/Download/Сборка Android-приложений.md" /root/CatGame/docs/GUIDE.md
+> cp "/sdcard/claude/notes/Сборка Android-приложений.md" /root/CatGame/docs/GUIDE.md
 > cd /root/CatGame && git diff docs/GUIDE.md
 > git commit -am "Инструкция: обновление" && git push
 > ```
@@ -402,7 +402,7 @@ app/src/main/res/values-ru/strings.xml      ← те же тексты по-ру
 glab mr view 50354 -R fdroid/fdroiddata --comments
 ```
 
-Ежедневная проверка (10:07) обновляет заметку `Статус заявки F-Droid.md` в «Загрузках».
+Ежедневная проверка (10:07) обновляет заметку `/sdcard/claude/notes/Статус заявки F-Droid.md`.
 Она работает в Termux: скрипт — `~/projects/tools/fdroid-mr-check.py` (команда `fdroid-mr-check`),
 расписание — `crontab -l`. Проверить прямо сейчас: `fdroid-mr-check`. Если Android выгрузил Termux
 и 10:07 прошло, проверка выполнится при открытии Termux (строки в `~/.bashrc` запускают `crond` и догоняют).
