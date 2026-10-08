@@ -28,4 +28,10 @@
     <string name="score_reset">Score reset</string>
     <string name="done">Done</string>
     <string name="version">Version %1$s</string>
+    <string name="critter_bird">🐦 Bird</string>
+    <string name="critter_fly">🪰 Fly</string>
+    <string name="critter_ladybug">🐞 Ladybug</string>
+    <string name="critter_lizard">🦎 Lizard</string>
+    <string name="critter_firefly">✨ Firefly</string>
+    <string name="variety">Variety: change the set of critters every minute or two</string>
 </resources>

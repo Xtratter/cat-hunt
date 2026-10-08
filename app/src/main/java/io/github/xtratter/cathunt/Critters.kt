@@ -13,11 +13,11 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.sin
 
-private const val PI_F = PI.toFloat()
+internal const val PI_F = PI.toFloat()
 
-private fun fill(color: Long) = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = color.toInt() }
+internal fun fill(color: Long) = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = color.toInt() }
 
-private fun stroke(color: Long, width: Float) = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+internal fun stroke(color: Long, width: Float) = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     this.color = color.toInt()
     style = Paint.Style.STROKE
     strokeWidth = width
@@ -32,6 +32,9 @@ abstract class Critter(protected val d: Float, protected val rnd: Random) {
     var alive = false
     var respawnIn = 0f
     var voiceIn = 2f
+    /** Variety mode: this critter is being retired and is removed once it is off-screen (or after a while). */
+    var leaving = false
+    var leaveLeft = 8f
     protected var time = 0f
 
     abstract val hitRadius: Float
@@ -55,6 +58,8 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
     protected abstract val pauseMin: Float
     protected abstract val pauseMax: Float
     protected abstract val hideChance: Float
+    /** Chance that after hiding off-screen the critter first peeks in at the edge and freezes, like prey checking the coast. */
+    protected open val peekChance = 0f
 
     var heading = 0f
     var speed = 0f
@@ -65,6 +70,7 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
     private var ty = 0f
     private var targetSpeed = 0f
     private var offTarget = false
+    private var peekArrive = false
     private var pauseLeft = 0f
     private var hiddenLeft = 0f
     private var legTime = 0f
@@ -89,6 +95,7 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
 
     private fun pickTarget(w: Float, h: Float, allowHide: Boolean) {
         legTime = 0f
+        peekArrive = false
         offTarget = allowHide && rnd.nextFloat() < hideChance
         if (offTarget) {
             val o = 90 * d
@@ -114,7 +121,18 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
         if (hiddenLeft > 0f) {
             hiddenLeft -= dt
             if (hiddenLeft <= 0f) {
-                pickTarget(w, h, allowHide = false)
+                if (rnd.nextFloat() < peekChance) {
+                    // come back just inside the nearest edge and freeze there
+                    val inset = 22 * d
+                    tx = if (x < 0f) inset else if (x > w) w - inset else x.coerceIn(inset, w - inset)
+                    ty = if (y < 0f) inset else if (y > h) h - inset else y.coerceIn(inset, h - inset)
+                    offTarget = false
+                    peekArrive = true
+                    legTime = 0f
+                    targetSpeed = (minSpeed * 0.8f) * d
+                } else {
+                    pickTarget(w, h, allowHide = false)
+                }
                 startedDash = true
             }
             return
@@ -132,6 +150,12 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
         } else {
             legTime += dt
             if (dist < 26 * d || legTime > 5f) {
+                if (peekArrive && dist < 26 * d) {
+                    peekArrive = false
+                    pauseLeft = 1.2f + rnd.nextFloat() * 1.8f
+                    speed = 0f
+                    return
+                }
                 if (offTarget && dist < 26 * d) {
                     hiddenLeft = 0.8f + rnd.nextFloat() * 2.2f
                     speed = 0f
@@ -165,7 +189,8 @@ class Mouse(d: Float, rnd: Random, furColor: Long) : Runner(d, rnd) {
     override val pauseChance = 0.55f
     override val pauseMin = 0.4f
     override val pauseMax = 2.2f
-    override val hideChance = 0.15f
+    override val hideChance = 0.25f
+    override val peekChance = 0.5f
     override val hitRadius = 40 * d
 
     private val fur = fill(furColor)

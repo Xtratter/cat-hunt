@@ -15,6 +15,8 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
+private const val ROTATION_SIZE = 3
+
 private class Particle(
     var x: Float, var y: Float, var vx: Float, var vy: Float,
     var life: Float, val maxLife: Float, val size: Float, val color: Int,
@@ -44,6 +46,8 @@ class GameView(
     private var flashColor = 0
     private var caught = 0
     private var hintLeft = 6f
+    private var rotateIn = 90f
+    private val rotationSize = ROTATION_SIZE
 
     /** While the settings panel is open: nothing moves, touches are ignored. */
     var frozen = false
@@ -71,18 +75,45 @@ class GameView(
         if (critters.isEmpty()) rebuild()
     }
 
+    /** One entry per enabled critter kind: how to build it. */
+    private fun enabledKinds(): List<(Float) -> Critter> {
+        val kinds = ArrayList<(Float) -> Critter>()
+        if (settings.mice) kinds += { s -> Mouse(s, rnd, 0xFFE8DCC8) }
+        if (settings.roach) kinds += { s -> Roach(s, rnd) }
+        if (settings.rope) kinds += { s -> Rope(s, rnd, 0xFF3D8BFF, 0xFFFFE066, 0xFF0A2A5A) }
+        if (settings.butterfly) kinds += { s -> Butterfly(s, rnd, 0xFFFF8F00, 0xFFFFC107) }
+        if (settings.fish) kinds += { s -> Fish(s, rnd, 0xFFFF7043, 0xFFFFAB91) }
+        if (settings.bird) kinds += { s -> Bird(s, rnd, 0xFF4FC3F7, 0xFF1E88E5) }
+        if (settings.fly) kinds += { s -> Fly(s, rnd) }
+        if (settings.ladybug) kinds += { s -> Ladybug(s, rnd) }
+        if (settings.lizard) kinds += { s -> Lizard(s, rnd) }
+        if (settings.firefly) kinds += { s -> Firefly(s, rnd) }
+        if (settings.laser) kinds += { s -> LaserDot(s, rnd) }
+        return kinds
+    }
+
     /** Recreates critters from the current settings; they enter the screen one by one. */
     fun rebuild() {
         val s = d * settings.size
         critters.clear()
-        if (settings.mice) critters += Mouse(s, rnd, 0xFFB0B0B0)
-        if (settings.roach) critters += Roach(s, rnd)
-        if (settings.rope) critters += Rope(s, rnd, 0xFFFF3D3D, 0xFFFFA0A0, 0xFF5A0000)
-        if (settings.butterfly) critters += Butterfly(s, rnd, 0xFFFF8F00, 0xFFFFC107)
-        if (settings.fish) critters += Fish(s, rnd, 0xFFFF7043, 0xFFFFAB91)
-        if (settings.mice) critters += Mouse(s, rnd, 0xFFE8DCC8)
-        if (settings.laser) critters += LaserDot(s, rnd)
+        var kinds = enabledKinds()
+        if (settings.variety && kinds.size > ROTATION_SIZE) kinds = kinds.shuffled(rnd).take(ROTATION_SIZE)
+        for (k in kinds) critters += k(s)
         critters.forEachIndexed { i, c -> c.respawnIn = 0.5f + i * 2.5f }
+        rotateIn = 70f + rnd.nextFloat() * 50f
+    }
+
+    /** Variety mode: swap the visible set; the old critters finish what they do and leave. */
+    private fun rotate() {
+        val s = d * settings.size
+        val kinds = enabledKinds()
+        if (!settings.variety || kinds.size <= ROTATION_SIZE) return
+        val current = critters.filter { !it.leaving }.map { it::class }
+        val fresh = kinds.shuffled(rnd).map { it(s) }.filter { it::class !in current }.take(ROTATION_SIZE - 1)
+        // keep one old critter for continuity, retire the rest
+        val keep = critters.filter { !it.leaving }.shuffled(rnd).take(1)
+        for (c in critters) if (c !in keep) c.leaving = true
+        for ((i, c) in fresh.withIndex()) { c.respawnIn = 0.5f + i * 2f; critters += c }
     }
 
     fun resetScore() {
@@ -116,6 +147,13 @@ class GameView(
         val w = width.toFloat()
         val h = height.toFloat()
         val critterDt = dt * settings.speed
+        if (settings.variety) {
+            rotateIn -= dt
+            if (rotateIn <= 0f) { rotateIn = 70f + rnd.nextFloat() * 50f; rotate() }
+        }
+        critters.removeAll {
+            it.leaving && (!it.alive || run { it.leaveLeft -= dt; it.leaveLeft <= 0f } || (!it.onScreen(w, h) && it.leaveLeft < 7f))
+        }
         for (c in critters) {
             if (!c.alive) {
                 c.respawnIn -= dt
@@ -139,6 +177,10 @@ class GameView(
                     c is Roach && rnd.nextFloat() < 0.6f -> sounds.play(sounds.rustle, 0.8f, pan(c), 0.9f + rnd.nextFloat() * 0.3f)
                     c is Rope && rnd.nextFloat() < 0.3f -> sounds.play(sounds.rustle, 0.5f, pan(c), 0.7f)
                     c is Fish && rnd.nextFloat() < 0.5f -> sounds.play(sounds.bubble, 0.8f, pan(c), 0.8f + rnd.nextFloat() * 0.4f)
+                    c is Bird && rnd.nextFloat() < 0.6f -> sounds.play(sounds.chirp, 0.45f, pan(c), 1f + rnd.nextFloat() * 0.4f)
+                    c is Fly && rnd.nextFloat() < 0.35f -> sounds.play(sounds.buzz, 0.4f, pan(c), 0.9f + rnd.nextFloat() * 0.3f)
+                    c is Lizard && rnd.nextFloat() < 0.6f -> sounds.play(sounds.rustle, 0.7f, pan(c), 1.1f)
+                    c is Ladybug && rnd.nextFloat() < 0.3f -> sounds.play(sounds.rustle, 0.3f, pan(c), 1.4f)
                 }
             }
         }
@@ -171,6 +213,9 @@ class GameView(
             is Roach -> sounds.play(sounds.rustle, 0.9f, pan(c))
             is Rope, is Butterfly -> sounds.play(sounds.chirp, 0.7f, pan(c))
             is Fish -> sounds.play(sounds.bubble, 0.9f, pan(c))
+            is Bird -> sounds.play(sounds.chirp, 0.7f, pan(c), 1.15f)
+            is Fly -> sounds.play(sounds.buzz, 0.6f, pan(c))
+            is Lizard, is Ladybug -> sounds.play(sounds.rustle, 0.5f, pan(c), 0.8f)
         }
     }
 

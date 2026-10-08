@@ -41,7 +41,13 @@ class SettingsPanel(
         col.toggle(R.string.critter_rope, settings::rope)
         col.toggle(R.string.critter_butterfly, settings::butterfly)
         col.toggle(R.string.critter_fish, settings::fish)
+        col.toggle(R.string.critter_bird, settings::bird)
+        col.toggle(R.string.critter_fly, settings::fly)
+        col.toggle(R.string.critter_ladybug, settings::ladybug)
+        col.toggle(R.string.critter_lizard, settings::lizard)
+        col.toggle(R.string.critter_firefly, settings::firefly)
         col.toggle(R.string.critter_laser, settings::laser)
+        col.toggle(R.string.variety, settings::variety)
 
         col.section(R.string.section_game)
         col.choice(R.string.speed_title, settings::speed,

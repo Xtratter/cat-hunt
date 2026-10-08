@@ -27,4 +27,10 @@
     <string name="score_reset">Счёт сброшен</string>
     <string name="done">Готово</string>
     <string name="version">Версия %1$s</string>
+    <string name="critter_bird">🐦 Птичка</string>
+    <string name="critter_fly">🪰 Муха</string>
+    <string name="critter_ladybug">🐞 Божья коровка</string>
+    <string name="critter_lizard">🦎 Ящерица</string>
+    <string name="critter_firefly">✨ Светлячок</string>
+    <string name="variety">Разнообразие: менять набор зверьков раз в минуту-две</string>
 </resources>

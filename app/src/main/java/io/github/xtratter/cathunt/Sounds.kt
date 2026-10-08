@@ -35,6 +35,7 @@ class Sounds(context: Context) {
     val psps: Int
     val sparkle: Int
     val bubble: Int
+    val buzz: Int
 
     /** Master volume, 0..1. */
     var volume = 1f
@@ -50,6 +51,7 @@ class Sounds(context: Context) {
         psps = load(dir, "psps", Synth.psps())
         sparkle = load(dir, "sparkle", Synth.sparkle())
         bubble = load(dir, "bubble", Synth.bubble())
+        buzz = load(dir, "buzz", Synth.buzz())
     }
 
     /** [pan] is -1 (left) .. 1 (right). */
@@ -150,6 +152,22 @@ private object Synth {
                 out[s0 + i] += (sin(PI * t).pow(0.7) * sin(ph)).toFloat()
             }
         }
+        return toPcm(out)
+    }
+
+    /** A fly's buzz: a rough 190 Hz tone with fast flutter. */
+    fun buzz(): ShortArray {
+        val n = len(0.4)
+        val out = FloatArray(n)
+        var ph = 0.0
+        for (i in 0 until n) {
+            val t = i.toDouble() / SR
+            ph += 2 * PI * (190 + 25 * sin(2 * PI * 31 * t)) / SR
+            val tone = sin(ph) + 0.5 * sin(2 * ph) + 0.3 * sin(3 * ph)
+            val env = sin(PI * i / n).pow(0.6) * (0.75 + 0.25 * sin(2 * PI * 80 * t))
+            out[i] = (env * (tone * 0.5 + noise() * 0.15)).toFloat()
+        }
+        bandPass(out, 700.0, 0.6)
         return toPcm(out)
     }
 
