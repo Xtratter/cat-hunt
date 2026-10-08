@@ -22,12 +22,11 @@
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
 
-    <!-- The settings panel is built in code (SettingsPanel) with android-ui-kit. -->
+    <!-- Settings: built in code (SettingsPanel). The container covers the screen: a tap outside the panel closes it. -->
     <FrameLayout
         android:id="@+id/settings_panel"
-        android:layout_width="360dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="top|end"
-        android:layout_margin="12dp"
+        android:clickable="true"
         android:visibility="gone" />
 </FrameLayout>

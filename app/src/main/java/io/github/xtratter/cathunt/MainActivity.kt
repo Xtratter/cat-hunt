@@ -5,6 +5,7 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.Gravity
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -52,6 +53,9 @@ class MainActivity : Activity() {
         gear.setOnLongClickListener { Haptics.play(Haptics.Kind.OPEN); openSettings(); true }
 
         Haptics.onClick(gear, Haptics.Kind.TICK)
+        panel.setOnClickListener { closeSettings() }
+        val width = (360 * resources.displayMetrics.density).toInt()
+        val margin = (12 * resources.displayMetrics.density).toInt()
         (panel as FrameLayout).addView(SettingsPanel(
             this, settings,
             onVolume = { sounds.volume = it },
@@ -61,7 +65,9 @@ class MainActivity : Activity() {
                 Toast.makeText(this, R.string.score_reset, Toast.LENGTH_SHORT).show()
             },
             onDone = { closeSettings() },
-        ).build())
+        ).build().apply { isClickable = true }, FrameLayout.LayoutParams(width, -1, Gravity.TOP or Gravity.END).apply {
+            setMargins(margin, margin, margin, margin)
+        })
     }
 
     private fun openSettings() {
