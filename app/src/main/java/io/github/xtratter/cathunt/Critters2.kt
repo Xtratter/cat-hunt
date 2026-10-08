@@ -212,7 +212,10 @@ class Firefly(d: Float, rnd: Random) : Runner(d, rnd) {
 
     private val body = fill(0xFF2E3B2E)
     private val glow = fill(0xFFE6FF59)
-    private val halo = fill(0xFFE6FF59)
+    private val halo = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+        shader = android.graphics.RadialGradient(0f, 0f, 1f,
+            intArrayOf(0xCCE6FF59.toInt(), 0x55E6FF59, 0x00E6FF59), floatArrayOf(0f, 0.4f, 1f), android.graphics.Shader.TileMode.CLAMP)
+    }
     private val wing = fill(0x44CFE8FF)
     private val phase = rnd.nextFloat() * 6f
 
@@ -224,9 +227,12 @@ class Firefly(d: Float, rnd: Random) : Runner(d, rnd) {
         c.save()
         c.translate(x, y)
         c.rotate(heading * 180f / PI_F)
-        halo.alpha = (28 * blink).toInt(); c.drawCircle(-12 * s, 0f, 40 * s, halo)
-        halo.alpha = (60 * blink).toInt(); c.drawCircle(-12 * s, 0f, 24 * s, halo)
-        halo.alpha = (120 * blink).toInt(); c.drawCircle(-12 * s, 0f, 13 * s, halo)
+        c.save()
+        c.translate(-12 * s, 0f)
+        c.scale(46 * s, 46 * s)
+        halo.alpha = (255 * blink).toInt()
+        c.drawCircle(0f, 0f, 1f, halo)
+        c.restore()
         val flap = 0.4f + 0.6f * abs(sin(time * 40f))
         for (side in intArrayOf(-1, 1)) {
             c.save(); c.scale(1f, flap)
