@@ -48,6 +48,7 @@ class SettingsPanel(
         col.toggle(R.string.critter_firefly, settings::firefly)
         col.toggle(R.string.critter_laser, settings::laser)
         col.toggle(R.string.variety, settings::variety)
+        col.toggle(R.string.covers, settings::covers)
 
         col.section(R.string.section_game)
         col.choice(R.string.speed_title, settings::speed,

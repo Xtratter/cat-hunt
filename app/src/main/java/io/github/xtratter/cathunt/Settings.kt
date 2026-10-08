@@ -21,6 +21,8 @@ class Settings(context: Context) {
     var firefly by flag("firefly")
     /** Rotate a few critters at a time so the cat does not get bored. */
     var variety by flag("variety")
+    /** Boxes and pots to hide under. */
+    var covers by flag("covers")
 
     var lure by flag("lure")
     var flash by flag("flash")
@@ -36,7 +38,7 @@ class Settings(context: Context) {
     var volume by number("volume", 1f)
 
     /** Changes when the set of critters must be rebuilt. */
-    fun rosterKey() = listOf(mice, roach, rope, butterfly, laser, fish, bird, fly, ladybug, lizard, firefly, variety, size).joinToString()
+    fun rosterKey() = listOf(mice, roach, rope, butterfly, laser, fish, bird, fly, ladybug, lizard, firefly, variety, covers, size).joinToString()
 
     private fun flag(key: String, default: Boolean = true) = object : ReadWriteProperty<Any?, Boolean> {
         override fun getValue(thisRef: Any?, property: KProperty<*>) = prefs.getBoolean(key, default)

@@ -47,6 +47,8 @@ class GameView(
     private var caught = 0
     private var hintLeft = 6f
     private var rotateIn = 90f
+    private val covers = ArrayList<Cover>()
+    private var coversIn = 200f
     private val timer = PlayTimer(settings.playMinutes.toInt())
     private var lastCritter: Critter? = null
     private var endNotified = false
@@ -82,6 +84,16 @@ class GameView(
         if (critters.isEmpty()) rebuild()
     }
 
+    /** Puts a box and a pot at random places; called at start and every few minutes while nobody is hiding. */
+    private fun placeCovers() {
+        covers.clear()
+        if (!settings.covers || width == 0) return
+        val r = 56 * d * settings.size.coerceIn(0.8f, 1.3f)
+        val spots = Cover.place(width.toFloat(), height.toFloat(), r, 2, rnd, gearZone = 90 * d)
+        spots.forEachIndexed { i, sp -> covers += Cover(if (i == 0) Cover.Kind.BOX else Cover.Kind.POT, sp.x, sp.y, r) }
+        coversIn = 150f + rnd.nextFloat() * 120f
+    }
+
     /** One entry per enabled critter kind: how to build it. */
     private fun enabledKinds(): List<(Float) -> Critter> {
         val kinds = ArrayList<(Float) -> Critter>()
@@ -103,6 +115,7 @@ class GameView(
     fun rebuild() {
         val s = d * settings.size
         critters.clear()
+        placeCovers()
         var kinds = enabledKinds()
         if (settings.variety && kinds.size > ROTATION_SIZE) kinds = kinds.shuffled(rnd).take(ROTATION_SIZE)
         for (k in kinds) critters += k(s)
@@ -177,6 +190,10 @@ class GameView(
         val w = width.toFloat()
         val h = height.toFloat()
         timer.update(dt)
+        coversIn -= dt
+        if (coversIn <= 0f && critters.none { it.underCover != null }) placeCovers()
+        for (cv in covers) cv.update(dt, occupied = critters.any { it.isHidden && it.underCover === cv })
+        for (c in critters) if (c.covers !== covers) c.covers = covers
         if (timer.phase == PlayTimer.Phase.LAST && lastCritter == null) chooseLast(w, h)
         if (timer.ended && !endNotified) { endNotified = true; onSessionEnd?.invoke() }
         val critterDt = dt * settings.speed * timer.speedFactor
@@ -258,7 +275,8 @@ class GameView(
         val h = height.toFloat()
         canvas.drawRect(0f, 0f, w, h, bgPaint)
 
-        for (c in critters) if (c.alive) c.draw(canvas)
+        for (c in critters) if (c.alive && !c.isHidden) c.draw(canvas)
+        for (cv in covers) cv.draw(canvas)
 
         for (r in rings) {
             val t = 1f - r.life / r.maxLife
@@ -319,8 +337,13 @@ class GameView(
 
     private fun touch(tx: Float, ty: Float, isDown: Boolean) {
         var hit = false
+        for (cv in covers) if (isDown && cv.hit(tx, ty, 6 * d)) {
+            cv.poke()
+            for (c in critters) if (c.isHidden && c.underCover === cv) c.popOut()
+            hit = true
+        }
         for (c in critters) {
-            if (c.alive && c.hitTest(tx, ty, 18 * d)) {
+            if (c.alive && !c.isHidden && c.hitTest(tx, ty, 18 * d)) {
                 catchIt(c, tx, ty)
                 hit = true
             }

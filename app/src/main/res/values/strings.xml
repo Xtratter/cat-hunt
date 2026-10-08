@@ -40,4 +40,5 @@
     <string name="winding_down">🌙 The hunt is winding down</string>
     <string name="good_hunt">Good hunt! 🐾 %1$d</string>
     <string name="hold_to_play">Hold ⚙ to play again</string>
+    <string name="covers">Hiding places: a box and a pot</string>
 </resources>

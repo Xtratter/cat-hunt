@@ -40,6 +40,14 @@ abstract class Critter(protected val d: Float, protected val rnd: Random) {
     abstract val hitRadius: Float
     /** The last critter of a session: freezes at its next stop and is easier to hit. */
     var tame = false
+    /** Hiding places currently on the field (set by the game). */
+    var covers: List<Cover> = emptyList()
+    /** True while the critter is out of sight (off-screen or under a cover): it is not drawn. */
+    open val isHidden: Boolean get() = false
+    /** The cover this critter is heading to or sitting under. */
+    var underCover: Cover? = null
+    /** A poke on the cover it sits under makes it spring out. */
+    open fun popOut() {}
     open fun hitTest(tx: Float, ty: Float, slack: Float) = hypot(tx - x, ty - y) < hitRadius * (if (tame) 1.7f else 1f) + slack
     fun onScreen(w: Float, h: Float) = x in 0f..w && y in 0f..h
 
@@ -98,8 +106,14 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
     private fun pickTarget(w: Float, h: Float, allowHide: Boolean) {
         legTime = 0f
         peekArrive = false
+        underCover = null
         offTarget = allowHide && rnd.nextFloat() < hideChance
-        if (offTarget) {
+        if (offTarget && covers.isNotEmpty() && rnd.nextFloat() < 0.65f) {
+            // run under a box or a pot instead of leaving the screen
+            val cv = covers[rnd.nextInt(covers.size)]
+            underCover = cv
+            tx = cv.x; ty = cv.y
+        } else if (offTarget) {
             val o = 90 * d
             when (rnd.nextInt(4)) {
                 0 -> { tx = -o; ty = rnd.nextFloat() * h }
@@ -115,6 +129,10 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
         targetSpeed = (minSpeed + rnd.nextFloat() * (maxSpeed - minSpeed)) * d
     }
 
+    override val isHidden: Boolean get() = hiddenLeft > 0f
+
+    override fun popOut() { if (hiddenLeft > 0f) hiddenLeft = 0.01f }
+
     protected open fun wobble(dt: Float) = 0f
 
     override fun update(dt: Float, w: Float, h: Float) {
@@ -123,7 +141,9 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
         if (hiddenLeft > 0f) {
             hiddenLeft -= dt
             if (hiddenLeft <= 0f) {
-                if (rnd.nextFloat() < peekChance) {
+                val fromCover = underCover != null
+                underCover = null
+                if (!fromCover && rnd.nextFloat() < peekChance) {
                     // come back just inside the nearest edge and freeze there
                     val inset = 22 * d
                     tx = if (x < 0f) inset else if (x > w) w - inset else x.coerceIn(inset, w - inset)
