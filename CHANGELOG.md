@@ -2,6 +2,20 @@
 
 [Русский](CHANGELOG.ru.md) · **English**
 
+## 1.7 — 2026-10-08
+- 🐦 🪰 🐞 🦎 ✨ Five new critters: a blue bird, a fly (with a buzz), a golden ladybug,
+  a lizard and a firefly. Blues and yellow-greens, which cats see best
+- Prey now peeks in at the screen edge, freezes and then springs out (search → stalk → pounce)
+- 📦 🪴 Hiding places: a cardboard box and a flower pot. Critters run under them and spring out;
+  the box twitches while someone is inside, a tap on it makes the critter jump out
+- "Variety" mode (on by default): only three kinds of critters at a time, the set changes
+  every minute or two so the cat does not get bored
+- ⏱ Play timer (optional, off by default: 5 / 10 / 15 minutes). When time is up the prey slows down,
+  one last critter stops for a final catch, then the screen fades out and goes to sleep
+- The string is now blue and yellow (easier for cats to see)
+- Redesigned settings panel (shared android-ui-kit): choice chips instead of sliders;
+  a tap outside the panel closes it and applies the changes
+
 ## 1.5 — 2026-09-30
 - English interface: the game follows the system language (English or Russian),
   as suggested by the F-Droid tester

@@ -7,12 +7,15 @@
 <li>🧶 a string — wriggles like a snake;</li>
 <li>🦋 a butterfly — flutters and sometimes lands;</li>
 <li>🐟 a fish — swims in waves and blows bubbles;</li>
-<li>🔴 a laser dot — darts around with sudden stops.</li>
+<li>🔴 a laser dot — darts around with sudden stops;</li>
+<li>🐦 a blue bird, 🪰 a fly, 🐞 a golden ladybug, 🦎 a lizard and ✨ a firefly.</li>
 </ul>
+
+<p>Prey peeks in from the screen edges and hides under a cardboard box and a flower pot; every minute or two the set of critters changes, so the cat does not get bored. Colours are chosen for cat vision — blues and yellow-greens.</p>
 
 <p>Sounds that attract cats: mouse squeaks, rustling, bird chirps, "pss-pss" and bubbles. When the cat catches something, there is a bright flash, a burst of sparks and a chime.</p>
 
-<p>Settings menu (long-press ⚙ in the top-right corner): choose which critters appear, speed, size, volume, lure sounds, flash and score.</p>
+<p>Settings menu (long-press ⚙ in the top-right corner): choose which critters appear, speed, size, volume, lure sounds, flash and score. There is an optional play timer: when it ends, the prey slows down, one last critter waits for a final catch and the screen fades out.</p>
 
 <p>Paw-proof: the screen stays on, system bars are hidden, and exiting requires a double press of Back.</p>
 

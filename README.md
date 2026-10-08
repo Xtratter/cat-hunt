@@ -4,9 +4,11 @@
 
 [Русский](README.ru.md) · **English**
 
-An Android game for cats. Mice and a cockroach run across the screen, a string wriggles,
-a butterfly flutters, a fish swims and a laser dot zips around. Sounds that attract cats play,
-and when the cat catches its prey, there is a flash and a burst of sparks.
+An Android game for cats. Mice, a cockroach, a bird, a fly, a ladybug, a lizard and fireflies run
+and fly across the screen, a string wriggles, a butterfly flutters, a fish swims and a laser dot zips around.
+They peek in from the edges and hide under a box and a flower pot. Sounds that attract cats play,
+and when the cat catches its prey, there is a flash and a burst of sparks. An optional play timer
+ends the hunt gently, with one last catch.
 
 ![Cat Hunt](fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
 
