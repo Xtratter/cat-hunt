@@ -42,6 +42,8 @@ class MainActivity : Activity() {
         game = GameView(this, sounds, settings)
         setContentView(R.layout.activity_main)
         findViewById<FrameLayout>(R.id.game_container).addView(game)
+        game.onSessionEnd = { window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
+        game.onSessionStart = { window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
         setupSettings()
     }
 
@@ -81,6 +83,7 @@ class MainActivity : Activity() {
         panel.visibility = View.GONE
         gear.visibility = View.VISIBLE
         if (settings.rosterKey() != rosterOnOpen) game.rebuild()
+        game.restartSession()
         game.frozen = false
         hideSystemUi()
     }

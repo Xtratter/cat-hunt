@@ -47,6 +47,13 @@ class GameView(
     private var caught = 0
     private var hintLeft = 6f
     private var rotateIn = 90f
+    private val timer = PlayTimer(settings.playMinutes.toInt())
+    private var lastCritter: Critter? = null
+    private var endNotified = false
+
+    /** Called when the session has faded out (the activity lets the screen sleep) and when it starts again. */
+    var onSessionEnd: (() -> Unit)? = null
+    var onSessionStart: (() -> Unit)? = null
     private val rotationSize = ROTATION_SIZE
 
     /** While the settings panel is open: nothing moves, touches are ignored. */
@@ -116,6 +123,19 @@ class GameView(
         for ((i, c) in fresh.withIndex()) { c.respawnIn = 0.5f + i * 2f; critters += c }
     }
 
+    /** Start a fresh play session (after the settings are closed). */
+    fun restartSession() {
+        val wasEnded = timer.ended
+        timer.restart(settings.playMinutes.toInt())
+        lastCritter = null
+        endNotified = false
+        for (c in critters) { c.tame = false; c.leaving = false }
+        if (wasEnded) rebuild()
+        hintLeft = 6f
+        onSessionStart?.invoke()
+        if (running) postInvalidateOnAnimation()
+    }
+
     fun resetScore() {
         caught = 0
     }
@@ -138,7 +158,17 @@ class GameView(
         lastNanos = now
         if (!frozen) update(dt)
         render(canvas)
-        if (running) postInvalidateOnAnimation()
+        if (running && !timer.ended) postInvalidateOnAnimation()
+    }
+
+    /** Session over: everything leaves except one critter, which stops somewhere on screen for a final catch. */
+    private fun chooseLast(w: Float, h: Float) {
+        val pick = critters.filter { it.alive && it.onScreen(w, h) }.let { l -> if (l.isEmpty()) null else l[rnd.nextInt(l.size)] }
+            ?: critters.filter { it.alive }.let { l -> if (l.isEmpty()) null else l[rnd.nextInt(l.size)] } ?: critters.let { l -> if (l.isEmpty()) null else l[rnd.nextInt(l.size)] } ?: return
+        if (!pick.alive) { pick.spawn(w, h); pick.alive = true }
+        pick.tame = true
+        lastCritter = pick
+        for (c in critters) if (c !== pick) c.leaving = true
     }
 
     private fun pan(c: Critter) = (c.x / width * 2 - 1).coerceIn(-1f, 1f)
@@ -146,7 +176,10 @@ class GameView(
     private fun update(dt: Float) {
         val w = width.toFloat()
         val h = height.toFloat()
-        val critterDt = dt * settings.speed
+        timer.update(dt)
+        if (timer.phase == PlayTimer.Phase.LAST && lastCritter == null) chooseLast(w, h)
+        if (timer.ended && !endNotified) { endNotified = true; onSessionEnd?.invoke() }
+        val critterDt = dt * settings.speed * timer.speedFactor
         if (settings.variety) {
             rotateIn -= dt
             if (rotateIn <= 0f) { rotateIn = 70f + rnd.nextFloat() * 50f; rotate() }
@@ -156,6 +189,7 @@ class GameView(
         }
         for (c in critters) {
             if (!c.alive) {
+                if (c.leaving || timer.phase == PlayTimer.Phase.FADE || timer.ended) continue
                 c.respawnIn -= dt
                 if (c.respawnIn <= 0f) {
                     c.spawn(w, h)
@@ -246,6 +280,24 @@ class GameView(
             canvas.drawRect(0f, 0f, w, h, flashPaint)
         }
 
+        if (timer.phase == PlayTimer.Phase.WIND_DOWN || timer.phase == PlayTimer.Phase.LAST) {
+            hintPaint.alpha = 150
+            canvas.drawText(context.getString(R.string.winding_down), w / 2, h - 24 * d, hintPaint)
+        }
+        if (timer.fade > 0f) {
+            flashPaint.color = 0xFF05090C.toInt()
+            flashPaint.alpha = (240 * timer.fade).toInt()
+            canvas.drawRect(0f, 0f, w, h, flashPaint)
+            if (timer.fade > 0.4f) {
+                val k = ((timer.fade - 0.4f) / 0.6f).coerceIn(0f, 1f)
+                hintPaint.alpha = (230 * k).toInt()
+                hintPaint.textSize = 26 * d
+                canvas.drawText(context.getString(R.string.good_hunt, caught), w / 2, h / 2, hintPaint)
+                hintPaint.textSize = 16 * d
+                hintPaint.alpha = (160 * k).toInt()
+                canvas.drawText(context.getString(R.string.hold_to_play), w / 2, h / 2 + 36 * d, hintPaint)
+            }
+        }
         if (settings.showScore) canvas.drawText("🐾 $caught", 16 * d, 30 * d, scorePaint)
         if (hintLeft > 0f) {
             hintPaint.alpha = (170 * min(1f, hintLeft)).toInt()
@@ -255,7 +307,7 @@ class GameView(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(e: MotionEvent): Boolean {
-        if (frozen) return true
+        if (frozen || timer.ended) return true
         when (e.actionMasked) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN ->
                 touch(e.getX(e.actionIndex), e.getY(e.actionIndex), isDown = true)
@@ -295,5 +347,6 @@ class GameView(
         flashColor = sparkColors[rnd.nextInt(sparkColors.size)]
         if (settings.flash) flashAlpha = 0.85f
         sounds.play(sounds.sparkle, 1f, (tx / width * 2 - 1).coerceIn(-1f, 1f))
+        if (c === lastCritter) timer.lastCaught()
     }
 }

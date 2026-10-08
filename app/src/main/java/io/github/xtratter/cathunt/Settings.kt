@@ -30,6 +30,8 @@ class Settings(context: Context) {
     var speed by number("speed", 1f)
     /** Multiplier for critter size, 0.6..1.6. */
     var size by number("size", 1f)
+    /** Play timer in minutes, 0 = off. */
+    var playMinutes by number("play_minutes", 10f)
     /** Sound volume, 0..1. */
     var volume by number("volume", 1f)
 

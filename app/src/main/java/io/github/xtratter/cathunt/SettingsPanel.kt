@@ -57,6 +57,9 @@ class SettingsPanel(
                 ctx.getString(R.string.size_l) to 1.4f))
 
         col.section(R.string.section_effects)
+        col.choice(R.string.timer_title, settings::playMinutes,
+            listOf(ctx.getString(R.string.timer_off) to 0f, ctx.getString(R.string.timer_min, 5) to 5f,
+                ctx.getString(R.string.timer_min, 10) to 10f, ctx.getString(R.string.timer_min, 15) to 15f))
         col.choice(R.string.volume_title, settings::volume,
             listOf(ctx.getString(R.string.volume_off) to 0f, "30%" to 0.3f, "60%" to 0.6f, "100%" to 1f),
             onChanged = { onVolume(it); onVolumeSet() })

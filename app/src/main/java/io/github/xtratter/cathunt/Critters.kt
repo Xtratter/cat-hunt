@@ -38,7 +38,9 @@ abstract class Critter(protected val d: Float, protected val rnd: Random) {
     protected var time = 0f
 
     abstract val hitRadius: Float
-    open fun hitTest(tx: Float, ty: Float, slack: Float) = hypot(tx - x, ty - y) < hitRadius + slack
+    /** The last critter of a session: freezes at its next stop and is easier to hit. */
+    var tame = false
+    open fun hitTest(tx: Float, ty: Float, slack: Float) = hypot(tx - x, ty - y) < hitRadius * (if (tame) 1.7f else 1f) + slack
     fun onScreen(w: Float, h: Float) = x in 0f..w && y in 0f..h
 
     abstract fun spawn(w: Float, h: Float)
@@ -161,8 +163,8 @@ abstract class Runner(d: Float, rnd: Random) : Critter(d, rnd) {
                     speed = 0f
                     return
                 }
-                if (rnd.nextFloat() < pauseChance) {
-                    pauseLeft = pauseMin + rnd.nextFloat() * (pauseMax - pauseMin)
+                if (tame || rnd.nextFloat() < pauseChance) {
+                    pauseLeft = if (tame) 1e9f else pauseMin + rnd.nextFloat() * (pauseMax - pauseMin)
                 } else {
                     pickTarget(w, h, allowHide = true)
                 }

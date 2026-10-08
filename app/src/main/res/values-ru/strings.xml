@@ -33,4 +33,10 @@
     <string name="critter_lizard">🦎 Ящерица</string>
     <string name="critter_firefly">✨ Светлячок</string>
     <string name="variety">Разнообразие: менять набор зверьков раз в минуту-две</string>
+    <string name="timer_title">Таймер игры</string>
+    <string name="timer_off">Выкл.</string>
+    <string name="timer_min">%1$d мин</string>
+    <string name="winding_down">🌙 Охота заканчивается</string>
+    <string name="good_hunt">Хорошая охота! 🐾 %1$d</string>
+    <string name="hold_to_play">Удерживайте ⚙, чтобы играть снова</string>
 </resources>

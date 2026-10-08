@@ -34,4 +34,10 @@
     <string name="critter_lizard">🦎 Lizard</string>
     <string name="critter_firefly">✨ Firefly</string>
     <string name="variety">Variety: change the set of critters every minute or two</string>
+    <string name="timer_title">Play timer</string>
+    <string name="timer_off">Off</string>
+    <string name="timer_min">%1$d min</string>
+    <string name="winding_down">🌙 The hunt is winding down</string>
+    <string name="good_hunt">Good hunt! 🐾 %1$d</string>
+    <string name="hold_to_play">Hold ⚙ to play again</string>
 </resources>
