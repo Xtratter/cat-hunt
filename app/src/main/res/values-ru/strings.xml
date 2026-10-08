@@ -12,10 +12,14 @@
     <string name="critter_fish">🐟 Рыбка</string>
     <string name="critter_laser">🔴 Лазерная точка</string>
     <string name="section_game">Игра</string>
-    <string name="speed">Скорость: %1$.1f×</string>
-    <string name="size">Размер: %1$.1f×</string>
+    <string name="speed_title">Скорость</string>
+    <string name="size_title">Размер</string>
+    <string name="size_s">Малый</string>
+    <string name="size_m">Средний</string>
+    <string name="size_l">Крупный</string>
     <string name="section_effects">Звук и эффекты</string>
-    <string name="volume">Громкость: %1$d%%</string>
+    <string name="volume_title">Громкость</string>
+    <string name="volume_off">Выкл.</string>
     <string name="lure">Звуки-приманки (пс-пс, щебет)</string>
     <string name="flash">Вспышка при поимке</string>
     <string name="show_score">Показывать счёт</string>

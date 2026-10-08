@@ -9,14 +9,11 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.SeekBar
-import android.widget.Switch
-import android.widget.TextView
 import android.widget.Toast
-import kotlin.math.roundToInt
-import kotlin.reflect.KMutableProperty0
+import io.github.xtratter.uikit.Expressive
+import io.github.xtratter.uikit.Haptics
+import io.github.xtratter.uikit.M3
 
 class MainActivity : Activity() {
     private lateinit var settings: Settings
@@ -36,6 +33,9 @@ class MainActivity : Activity() {
             }
         }
         volumeControlStream = AudioManager.STREAM_MUSIC
+        M3.apply(this, M3.Mode.DARK, translucent = false, custom = Theme.cat)
+        Haptics.init(this, getSharedPreferences("prefs", MODE_PRIVATE))
+        Haptics.onTouch = { v, e -> Expressive.morph(v, e) }
         settings = Settings(this)
         sounds = Sounds(this).apply { volume = settings.volume }
         game = GameView(this, sounds, settings)
@@ -49,74 +49,19 @@ class MainActivity : Activity() {
         gear = findViewById(R.id.gear)
         panel = findViewById(R.id.settings_panel)
         gear.setOnClickListener { Toast.makeText(this, R.string.hold_for_settings, Toast.LENGTH_SHORT).show() }
-        gear.setOnLongClickListener { openSettings(); true }
+        gear.setOnLongClickListener { Haptics.play(Haptics.Kind.OPEN); openSettings(); true }
 
-        bindSwitch(R.id.sw_mice, settings::mice)
-        bindSwitch(R.id.sw_roach, settings::roach)
-        bindSwitch(R.id.sw_rope, settings::rope)
-        bindSwitch(R.id.sw_butterfly, settings::butterfly)
-        bindSwitch(R.id.sw_fish, settings::fish)
-        bindSwitch(R.id.sw_laser, settings::laser)
-        bindSwitch(R.id.sw_lure, settings::lure)
-        bindSwitch(R.id.sw_flash, settings::flash)
-        bindSwitch(R.id.sw_score, settings::showScore)
-
-        bindSeek(R.id.seek_speed, R.id.label_speed, settings::speed, 0.5f, 2f, 0.1f) {
-            getString(R.string.speed, it)
-        }
-        bindSeek(R.id.seek_size, R.id.label_size, settings::size, 0.6f, 1.6f, 0.1f) {
-            getString(R.string.size, it)
-        }
-        bindSeek(R.id.seek_volume, R.id.label_volume, settings::volume, 0f, 1f, 0.1f,
-            onChanged = { sounds.volume = it },
-            onReleased = { sounds.play(sounds.squeak) },
-        ) { getString(R.string.volume, (it * 100).roundToInt()) }
-
-        findViewById<Button>(R.id.btn_reset).setOnClickListener {
-            game.resetScore()
-            Toast.makeText(this, R.string.score_reset, Toast.LENGTH_SHORT).show()
-        }
-        findViewById<Button>(R.id.btn_done).setOnClickListener { closeSettings() }
-        findViewById<TextView>(R.id.version).text =
-            getString(R.string.version, packageManager.getPackageInfo(packageName, 0).versionName)
-    }
-
-    private fun bindSwitch(id: Int, prop: KMutableProperty0<Boolean>) {
-        findViewById<Switch>(id).apply {
-            isChecked = prop.get()
-            setOnCheckedChangeListener { _, checked -> prop.set(checked) }
-        }
-    }
-
-    private fun bindSeek(
-        seekId: Int,
-        labelId: Int,
-        prop: KMutableProperty0<Float>,
-        min: Float,
-        max: Float,
-        step: Float,
-        onChanged: (Float) -> Unit = {},
-        onReleased: () -> Unit = {},
-        label: (Float) -> String,
-    ) {
-        val labelView = findViewById<TextView>(labelId)
-        val valueAt = { progress: Int -> min + progress * step }
-        findViewById<SeekBar>(seekId).apply {
-            this.max = ((max - min) / step).roundToInt()
-            progress = ((prop.get() - min) / step).roundToInt()
-            labelView.text = label(valueAt(progress))
-            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    val value = valueAt(progress)
-                    prop.set(value)
-                    labelView.text = label(value)
-                    onChanged(value)
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar) = onReleased()
-            })
-        }
+        Haptics.onClick(gear, Haptics.Kind.TICK)
+        (panel as FrameLayout).addView(SettingsPanel(
+            this, settings,
+            onVolume = { sounds.volume = it },
+            onVolumeSet = { sounds.play(sounds.squeak) },
+            onReset = {
+                game.resetScore()
+                Toast.makeText(this, R.string.score_reset, Toast.LENGTH_SHORT).show()
+            },
+            onDone = { closeSettings() },
+        ).build())
     }
 
     private fun openSettings() {

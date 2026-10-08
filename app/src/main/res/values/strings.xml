@@ -13,10 +13,14 @@
     <string name="critter_fish">🐟 Fish</string>
     <string name="critter_laser">🔴 Laser dot</string>
     <string name="section_game">Game</string>
-    <string name="speed">Speed: %1$.1f×</string>
-    <string name="size">Size: %1$.1f×</string>
+    <string name="speed_title">Speed</string>
+    <string name="size_title">Size</string>
+    <string name="size_s">Small</string>
+    <string name="size_m">Medium</string>
+    <string name="size_l">Large</string>
     <string name="section_effects">Sound and effects</string>
-    <string name="volume">Volume: %1$d%%</string>
+    <string name="volume_title">Volume</string>
+    <string name="volume_off">Off</string>
     <string name="lure">Lure sounds (pss-pss, chirping)</string>
     <string name="flash">Flash on catch</string>
     <string name="show_score">Show score</string>

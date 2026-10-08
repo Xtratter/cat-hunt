@@ -41,3 +41,11 @@ class Settings(context: Context) {
             prefs.edit().putFloat(key, value).apply()
     }
 }
+
+/** The kit theme: the game's dark teal with the icon's amber accent. */
+object Theme {
+    val cat = io.github.xtratter.uikit.M3.Custom(
+        primary = 0xFFFFC107.toInt(), secondary = 0xFFE0C98A.toInt(), tertiary = 0xFF7FD6C8.toInt(),
+        base = 0xFF14222A.toInt(), surface = 0xFF1B2A34.toInt(),
+    )
+}
